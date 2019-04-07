@@ -1,3 +1,38 @@
+@import "../styles/variables.scss";
+
 .egc-header {
-  
+  padding: 5px;
+  height: 100px;
+  background: $egc-primary;
+  display: flex;
+  flex-direction: row;
+  border-radius: 15px 15px 0 0;
+
+  .app-title {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+
+    i {
+      background: url(../assets/images/logo-color.png) no-repeat;
+      background-size: 150px 91px;
+      width: 150px;
+    }
+  }
+}
+
+.egc-menu {
+  border-radius: 0 0 15px 15px;
+
+  &.mat-toolbar-row, &.mat-toolbar-single-row {
+    height: 48px;
+  }
+
+  .filler {
+    flex: 1 1 auto;
+  }
+}
+
+main {
+  margin: 10px 0;
 }
