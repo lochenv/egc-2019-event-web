@@ -2,9 +2,12 @@
 <header>
   <div class="egc-header">
     <div>
-      <button mat-icon-button [matMenuTriggerFor]="menu">
-        <mat-icon color="accent">menu</mat-icon>
-      </button>
+      <a routerLink="/home" routerLinkActive="active">
+        <mat-icon color="accent">home</mat-icon>
+      </a>
+      <!--<button mat-icon-button [matMenuTriggerFor]="menu">-->
+        <!--<mat-icon color="accent">menu</mat-icon>-->
+      <!--</button>-->
       <mat-menu #menu="matMenu">
         <button mat-menu-item *ngFor="let menuEntry of menuEntries">
           <mat-icon>{{ menuEntry.icon }}</mat-icon>
