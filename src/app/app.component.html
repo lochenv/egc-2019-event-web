@@ -1,37 +1,32 @@
 <!--The content below is only a placeholder and can be replaced.-->
 <header>
-  <div class="egc-header">
-    <div>
-      <a routerLink="/home" routerLinkActive="active">
-        <mat-icon color="accent">home</mat-icon>
-      </a>
-      <!--<button mat-icon-button [matMenuTriggerFor]="menu">-->
-        <!--<mat-icon color="accent">menu</mat-icon>-->
-      <!--</button>-->
-      <mat-menu #menu="matMenu">
+    <div class="egc-header">
+        <div>
+            <a routerLink="/home" routerLinkActive="active">
+                <mat-icon color="accent">home</mat-icon>
+            </a>
+            <mat-menu #menu="matMenu"></mat-menu>
+        </div>
+        <div class="app-title">
+            <i></i>
+        </div>
+        <div>Other info</div>
+    </div>
+    <mat-toolbar class="egc-menu" color="accent">
         <button mat-menu-item *ngFor="let menuEntry of menuEntries">
-          <mat-icon>{{ menuEntry.icon }}</mat-icon>
-          <span>{{ menuEntry.label }}</span>
+            <a routerLink="{{ menuEntry.stateName}}" routerLinkActive="true">
+                <mat-icon>{{ menuEntry.icon }}</mat-icon>
+                <span>{{ menuEntry.label }}</span>
+            </a>
         </button>
-      </mat-menu>
-    </div>
-    <div class="app-title">
-      <i></i>
-    </div>
-    <div>Other info</div>
-  </div>
-  <mat-toolbar class="egc-menu" color="accent">
-    <button mat-menu-item *ngFor="let menuEntry of menuEntries">
-      <mat-icon>{{ menuEntry.icon }}</mat-icon>
-      <span>{{ menuEntry.label }}</span>
-    </button>
-    <div class="filler"></div>
-  </mat-toolbar>
+        <div class="filler"></div>
+
+    </mat-toolbar>
 </header>
 <main>
-  <mat-card>
-    <mat-card-content>
-      <router-outlet></router-outlet>
-    </mat-card-content>
-  </mat-card>
+    <mat-card>
+        <mat-card-content>
+            <router-outlet></router-outlet>
+        </mat-card-content>
+    </mat-card>
 </main>

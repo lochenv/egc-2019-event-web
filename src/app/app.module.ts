@@ -7,9 +7,13 @@ import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 import {MatButtonModule, MatCardModule, MatIconModule, MatMenuModule, MatToolbarModule} from '@angular/material';
 import {HomeComponent} from './home/home.component';
 import {RouterModule, Routes} from '@angular/router';
+import { RegistrationComponent } from './registration/registration.component';
+import {HttpClientModule} from '@angular/common/http';
+import {SubscribersService} from './shared';
 
 const appRoutes: Routes = [
-    {path: 'home', component: HomeComponent}
+    {path: 'home', component: HomeComponent},
+    {path: 'registration', component: RegistrationComponent}
 
     // {path: '**', component: PageNotFoundComponent}
 ];
@@ -17,7 +21,8 @@ const appRoutes: Routes = [
 @NgModule({
     declarations: [
         AppComponent,
-        HomeComponent
+        HomeComponent,
+        RegistrationComponent
     ],
     imports: [
         RouterModule.forRoot(
@@ -26,6 +31,7 @@ const appRoutes: Routes = [
         ),
         BrowserModule,
         BrowserAnimationsModule,
+        HttpClientModule,
         AppRoutingModule,
         MatIconModule,
         MatMenuModule,
@@ -34,7 +40,7 @@ const appRoutes: Routes = [
         MatCardModule,
         RouterModule
     ],
-    providers: [],
+    providers: [SubscribersService],
     bootstrap: [AppComponent]
 })
 export class AppModule {
