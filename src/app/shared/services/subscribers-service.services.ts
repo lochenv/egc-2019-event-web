@@ -4,7 +4,8 @@ import {HttpClient, HttpErrorResponse, HttpResponse} from '@angular/common/http'
 @Injectable()
 export class SubscribersService {
 
-    private subscribersUri = 'http://egc.srtt.pro/congress?export=true&token=rJV2P0HxWp8XaofbgN4dy2hc26ijB5WZz0nsKLpz7q2nA';
+    private subscribersUri = 'https://egc.srtt.pro/congress/registered-participants?export=' +
+        'true&token=rJV2P0HxWp8XaofbgN4dy2hc26ijB5WZz0nsKLpz7q2nA';
 
     public constructor(private httpClient: HttpClient) {
     }
