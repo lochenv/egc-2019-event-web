@@ -1,5 +1,6 @@
 import {Injectable} from '@angular/core';
 import {HttpClient, HttpErrorResponse, HttpResponse} from '@angular/common/http';
+import {take} from 'rxjs/internal/operators';
 
 @Injectable()
 export class SubscribersService {
@@ -12,7 +13,10 @@ export class SubscribersService {
 
     public getSubscribers(): any {
         this.httpClient.get(this.subscribersUri, {observe: 'response'})
-            .subscribe((data: HttpResponse<any>) => {
+          .pipe(
+            take(1)
+          )
+          .subscribe((data: HttpResponse<any>) => {
                     console.log('Return message', data.status);
                 },
                 (error: HttpErrorResponse) => {

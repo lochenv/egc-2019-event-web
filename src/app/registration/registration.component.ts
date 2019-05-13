@@ -1,5 +1,8 @@
-import { Component, OnInit } from '@angular/core';
+import {Component, HostBinding, OnInit} from '@angular/core';
 import {SubscribersService} from '../shared/services';
+import {FormBuilder, FormGroup, Validators} from '@angular/forms';
+
+const componentName: string = 'app-registration';
 
 @Component({
   selector: 'app-registration',
@@ -8,10 +11,39 @@ import {SubscribersService} from '../shared/services';
 })
 export class RegistrationComponent implements OnInit {
 
-  constructor(private subsriberService: SubscribersService) { }
+  @HostBinding()
+  public class: string = componentName;
 
-  ngOnInit() {
-    this.subsriberService.getSubscribers();
+  public formGroup: FormGroup;
+
+  constructor(private subscribersService: SubscribersService,
+              private formBuilder: FormBuilder) {
   }
 
+  ngOnInit() {
+    this.subscribersService.getSubscribers();
+
+    this.formGroup = this.formBuilder.group({
+      firstName: [
+        '',
+        [Validators.required]
+      ],
+      lastName: [
+        '',
+        [Validators.required]
+      ],
+      level: [
+        '',
+        [Validators.required]
+      ],
+      country: [
+        '',
+        [Validators.required]
+      ],
+      egcPin: [
+        '',
+        [Validators.required]
+      ]
+    })
+  }
 }
