@@ -2,3 +2,8 @@
   /*position: relative;*/
   /*min-height: 100vh;*/
 }
+
+.mat-form-field-outline {
+    background: #fff;
+    border-radius: 5px;
+}

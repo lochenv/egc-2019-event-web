@@ -1,0 +1,30 @@
+<form class="form" [formGroup]="loginForm" (ngSubmit)="login()">
+    <h3>Please sign in before using the app</h3>
+    <div class="form-content">
+        <mat-form-field>
+            <mat-label>Username</mat-label>
+            <input matInput
+                   formControlName="username"
+                   type="text"
+                   required/>
+            <mat-error *ngIf="!loginForm.controls['username'].valid">
+                <div>{{ getErrorMessage( 'username') }}</div>
+            </mat-error>
+        </mat-form-field>
+        <mat-form-field>
+            <mat-label>Password</mat-label>
+            <input matInput
+                   formControlName="password"
+                   type="password"
+                   required/>
+            <mat-error *ngIf="!loginForm.controls['password'].valid">
+                <div>{{ getErrorMessage( 'password') }}</div>
+            </mat-error>
+        </mat-form-field>
+    </div>
+
+    <div class="form-actions">
+        <button mat-flat-button type="submit"
+        color="primary">Login</button>
+    </div>
+</form>

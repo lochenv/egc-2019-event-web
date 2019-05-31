@@ -44,6 +44,6 @@ export class RegistrationComponent implements OnInit {
         '',
         [Validators.required]
       ]
-    })
+    });
   }
 }
