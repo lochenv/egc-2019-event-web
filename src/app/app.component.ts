@@ -1,5 +1,6 @@
 import {Component, OnInit} from '@angular/core';
 import {MenuEntry} from './shared/domain';
+import {SignInService} from './shared/services';
 
 @Component({
     selector: 'app-root',
@@ -9,6 +10,9 @@ import {MenuEntry} from './shared/domain';
 export class AppComponent implements OnInit {
 
     title = 'Organisation EGC2019';
+
+    constructor(private signInService: SignInService) {
+    }
 
     public menuEntries: MenuEntry[];
 
@@ -36,5 +40,9 @@ export class AppComponent implements OnInit {
                 stateName: 'TO_BE_DEFINED'
             }
         ];
+    }
+
+    public logout(): void {
+        this.signInService.logout();
     }
 }

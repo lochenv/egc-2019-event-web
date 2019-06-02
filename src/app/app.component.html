@@ -10,7 +10,9 @@
         <div class="app-title">
             <i></i>
         </div>
-        <div>Other info</div>
+        <div>
+            <mat-icon color="accent" (click)="logout()">exit_to_app</mat-icon>
+        </div>
     </div>
     <mat-toolbar class="egc-menu" color="accent">
         <button mat-menu-item *ngFor="let menuEntry of menuEntries">

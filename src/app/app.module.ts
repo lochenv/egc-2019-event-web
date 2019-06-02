@@ -12,17 +12,31 @@ import {
 import {HomeComponent} from './home/home.component';
 import {RouterModule, Routes} from '@angular/router';
 import {RegistrationComponent} from './registration/registration.component';
-import {HttpClientModule} from '@angular/common/http';
-import {SignInService, SubscribersService} from './shared';
+import {HTTP_INTERCEPTORS, HttpClientModule} from '@angular/common/http';
+import {SignInService, SubscribersService, AuthenticationInterceptor, RegistrationService, ErrorLogoutInterceptor} from './shared';
 import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {LoginComponent} from './login/login.component';
+import {AuthGardService} from './shared/services/auth-gard.service';
 
 const appRoutes: Routes = [
-    {path: 'home', component: HomeComponent},
-    {path: 'registration', component: RegistrationComponent},
-    {path: 'login', component: LoginComponent}
-
-    // {path: '**', component: PageNotFoundComponent}
+    {
+        path: 'home',
+        component: HomeComponent,
+        canActivate: [AuthGardService]
+    },
+    {
+        path: 'registration',
+        component: RegistrationComponent,
+        canActivate: [AuthGardService]
+    },
+    {
+        path: 'login',
+        component: LoginComponent
+    },
+    {
+        path: '**',
+        redirectTo: '/home'
+    }
 ];
 
 @NgModule({
@@ -55,7 +69,10 @@ const appRoutes: Routes = [
     providers: [
         SubscribersService,
         SignInService,
-        {provide: MAT_FORM_FIELD_DEFAULT_OPTIONS, useValue: {appearance: 'outline'}}],
+        RegistrationService,
+        {provide: MAT_FORM_FIELD_DEFAULT_OPTIONS, useValue: {appearance: 'outline'}},
+        {provide: HTTP_INTERCEPTORS, useClass: AuthenticationInterceptor, multi: true},
+        {provide: HTTP_INTERCEPTORS, useClass: ErrorLogoutInterceptor, multi: true}],
     bootstrap: [AppComponent]
 })
 export class AppModule {

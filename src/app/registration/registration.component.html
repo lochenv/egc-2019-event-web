@@ -1,6 +1,6 @@
 <h2>Registration form</h2>
 
-<form [formGroup]="formGroup" novalidate>
+<form [formGroup]="formGroup" novalidate (ngSubmit)="register()">
 
   <!-- First Name -->
   <mat-form-field>
@@ -19,5 +19,8 @@
            type="text"
            required>
   </mat-form-field>
+
+  <button mat-flat-button type="submit"
+          color="primary">Register</button>
 </form>
 
