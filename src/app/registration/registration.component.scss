@@ -1,0 +1,43 @@
+@import "../../styles/variables.scss";
+
+.form {
+  margin: 0 auto;
+  width: 500px;
+  border: $egc-primary 2px solid;
+  border-radius: 15px;
+  padding: 15px;
+  background: $egc-form-background;
+
+  .form-content {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .form-actions {
+    display: flex;
+    justify-content: flex-end;
+  }
+
+  .form-line {
+    display: flex;
+
+    mat-form-field {
+      flex: 1;
+      margin-right: 20px;
+    }
+
+    mat-form-field:last-child {
+      margin-right: inherit;
+    }
+
+    .full-name {
+      flex: 2;
+    }
+
+    .small-input {
+      width: 5em;
+    }
+  }
+}
+
+

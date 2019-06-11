@@ -5,9 +5,9 @@ import {AppRoutingModule} from './app-routing.module';
 import {AppComponent} from './app.component';
 import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 import {
-    MAT_FORM_FIELD_DEFAULT_OPTIONS,
-    MatButtonModule, MatCardModule, MatFormFieldModule, MatIconModule, MatInputModule, MatMenuModule,
-    MatToolbarModule
+  MAT_FORM_FIELD_DEFAULT_OPTIONS,
+  MatButtonModule, MatCardModule, MatFormFieldModule, MatIconModule, MatInputModule, MatMenuModule, MatSelectModule,
+  MatToolbarModule
 } from '@angular/material';
 import {HomeComponent} from './home/home.component';
 import {RouterModule, Routes} from '@angular/router';
@@ -64,6 +64,7 @@ const appRoutes: Routes = [
         MatToolbarModule,
         MatCardModule,
         MatInputModule,
+        MatSelectModule,
         RouterModule
     ],
     providers: [

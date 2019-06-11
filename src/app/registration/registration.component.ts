@@ -16,26 +16,36 @@ export class RegistrationComponent implements OnInit {
 
   public formGroup: FormGroup;
 
+  public ageOptions: string[];
+
+  public isoCodeOptions: string[];
+
   constructor(private subscribersService: SubscribersService,
               private registerService: RegistrationService,
               private formBuilder: FormBuilder) {
   }
 
   ngOnInit() {
+    this.ageOptions = ['Equal or more than 18', 'Less than 18', 'Less than 12'];
+    this.isoCodeOptions = [];
     this.subscribersService.getSubscribers();
 
     this.formGroup = this.formBuilder.group({
-      firstName: [
+      fullName: [
         '',
         [Validators.required]
       ],
-      lastName: [
+      age: [
         '',
         [Validators.required]
+      ],
+      email: [
+        '',
+        [Validators.required, Validators.email]
       ],
       level: [
         '',
-        [Validators.required]
+        [Validators.required, Validators.pattern(/^(\d{1,2}[k]|\d[d])$/)]
       ],
       country: [
         '',
