@@ -1,92 +1,119 @@
 <form class="form" [formGroup]="formGroup" novalidate (ngSubmit)="register()">
+    <h3>Registration form</h3>
 
-  <h3>Registration form</h3>
-  <div class="form-content">
-
-    <!--
-    First page or left part
-      Name + First 1 champ + Tranche d'age (défault +18)
-      Country (iSOCODE ?) + Level + EGD PIN
-      Email + Receive notification
-      Club + Phone
-    Second page or right (see template)
-      First Week | Week-end | Second Week
-      X (Date)   | X (Date) | X (Date)
-      X (Date)   | X (Date) | X (Date)
-      X (Date)   | X (Date) | X (Date)
-      X (Date)   | X (Date) | X (Date)
-      X (Date)   | X (Date) | X (Date)
-    -->
-    <!-- First Line -->
-    <div class="form-line">
-      <!-- First Name -->
-      <mat-form-field class="full-name">
-        <mat-label>Full Name</mat-label>
-        <input matInput
-               formControlName="fullName"
-               type="text"
-               required>
-      </mat-form-field>
-      <mat-form-field>
-        <mat-label>Age</mat-label>
-        <mat-select formControlName="age"
-          required>
-          <mat-option *ngFor="let ageOption of ageOptions" [value]="ageOption">
-            {{ ageOption }}
-          </mat-option>
-        </mat-select>
-      </mat-form-field>
+    <!-- First ask if new or existing -->
+    <div *ngIf="currentStep === 0">
+        <button (click)="currentStep = 2">New</button>
+        <button (click)="currentStep = 1">Pre-registered</button>
     </div>
 
-    <!-- Second line -->
-    <div class="form-line">
-      <!-- Country -->
-      <mat-form-field class="small-input">
-        <mat-label>Country</mat-label>
-        <input matInput
-               formControlName="country"
-               type="text"
-               required>
-      </mat-form-field>
+    <div *ngIf="currentStep === 1">
 
-      <!-- Level -->
-      <mat-form-field class="small-input">
-        <mat-label>Level</mat-label>
-        <input matInput
-               formControlName="level"
-               placeholder="25k, 5k or 7d"
-               type="text"
-               required>
-      </mat-form-field>
+        <mat-form-field>
+            <mat-label>Enter EGCBel or EGDPin</mat-label>
+            <input matInput
+                   formControlName="searchPin"
+                   type="text"
+                   required>
+        </mat-form-field>
 
-      <!-- Level -->
-      <mat-form-field class="full-name">
-        <mat-label>EGD Pin</mat-label>
-        <input matInput
-               placeholder="8 digits"
-               formControlName="egdPin"
-               type="text"
-               required>
-      </mat-form-field>
+        <button (click)="findAndNext()">Next</button>
     </div>
 
-    <!-- Third line -->
-    <div class="form-line">
-      <mat-form-field>
-        <mat-label>E-mail address</mat-label>
-        <input matInput
-               formControlName="email"
-               type="text"
-               required>
-      </mat-form-field>
-    </div>
-  </div>
+    <div class="form-content" *ngIf="currentStep === 2">
 
-  <div class="form-actions">
-    <button mat-flat-button
-            type="submit"
-            color="primary">Register
-    </button>
-  </div>
+        <!--
+        First page or left part
+          Name + First 1 champ + Tranche d'age (défault +18)
+          Country (iSOCODE ?) + Level + EGD PIN
+          Email + Receive notification
+          Club + Phone
+        Second page or right (see template)
+          First Week | Week-end | Second Week
+          X (Date)   | X (Date) | X (Date)
+          X (Date)   | X (Date) | X (Date)
+          X (Date)   | X (Date) | X (Date)
+          X (Date)   | X (Date) | X (Date)
+          X (Date)   | X (Date) | X (Date)
+        -->
+        <!-- First Line -->
+        <div class="form-line">
+            <!-- First Name -->
+            <mat-form-field class="full-name">
+                <mat-label>First Name</mat-label>
+                <input matInput
+                       formControlName="firstName"
+                       type="text"
+                       required>
+            </mat-form-field>
+            <!-- First Name -->
+            <mat-form-field class="full-name">
+                <mat-label>Last Name</mat-label>
+                <input matInput
+                       formControlName="lastName"
+                       type="text"
+                       required>
+            </mat-form-field>
+            <mat-form-field>
+                <mat-label>Age</mat-label>
+                <mat-select formControlName="age"
+                            required>
+                    <mat-option *ngFor="let ageOption of ageOptions" [value]="ageOption">
+                        {{ ageOption }}
+                    </mat-option>
+                </mat-select>
+            </mat-form-field>
+        </div>
+
+        <!-- Second line -->
+        <div class="form-line">
+            <!-- Country -->
+            <mat-form-field class="small-input">
+                <mat-label>Country</mat-label>
+                <input matInput
+                       formControlName="country"
+                       type="text"
+                       required>
+            </mat-form-field>
+
+            <!-- Level -->
+            <mat-form-field class="small-input">
+                <mat-label>Level</mat-label>
+                <input matInput
+                       formControlName="level"
+                       placeholder="25k, 5k or 7d"
+                       type="text"
+                       required>
+            </mat-form-field>
+
+            <!-- Level -->
+            <mat-form-field class="full-name">
+                <mat-label>EGD Pin</mat-label>
+                <input matInput
+                       placeholder="8 digits"
+                       formControlName="egdPin"
+                       type="text"
+                       required>
+            </mat-form-field>
+        </div>
+
+        <!-- Third line -->
+        <div class="form-line">
+            <mat-form-field>
+                <mat-label>E-mail address</mat-label>
+                <input matInput
+                       formControlName="email"
+                       type="text"
+                       required>
+            </mat-form-field>
+        </div>
+    </div>
+
+    <div class="form-actions">
+        <button mat-flat-button
+                type="submit"
+                color="primary">Register
+        </button>
+    </div>
 </form>
 

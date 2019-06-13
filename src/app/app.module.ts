@@ -17,6 +17,7 @@ import {SignInService, SubscribersService, AuthenticationInterceptor, Registrati
 import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {LoginComponent} from './login/login.component';
 import {AuthGardService} from './shared/services/auth-gard.service';
+import { ExtractListComponent } from './extract-list/extract-list.component';
 
 const appRoutes: Routes = [
     {
@@ -44,7 +45,8 @@ const appRoutes: Routes = [
         AppComponent,
         HomeComponent,
         RegistrationComponent,
-        LoginComponent
+        LoginComponent,
+        ExtractListComponent
     ],
     imports: [
         RouterModule.forRoot(
