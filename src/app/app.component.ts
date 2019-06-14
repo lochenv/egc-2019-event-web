@@ -27,7 +27,7 @@ export class AppComponent implements OnInit {
             {
                 icon: 'people',
                 label: 'Extract player list',
-                stateName: 'TO_BE_DEFINED'
+                stateName: 'extract-list'
             },
             {
                 icon: 'notifications_active',

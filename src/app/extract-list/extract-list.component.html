@@ -1,3 +1,70 @@
-<p>
-  extract-list works!
-</p>
+<div class="form" [ngClass]="{ 'large-width': displayList(), 'simple-width': !displayList() }">
+    <h3>Extract player list</h3>
+
+    <div *ngIf="action === undefined" class="options">
+        <button mat-flat-button
+                color="primary">Main Tournament
+        </button>
+        <button mat-flat-button
+                color="primary">Weekend Tournament
+        </button>
+        <button mat-flat-button
+                color="primary"
+                (click)="setDisplayList()">Custom choice
+        </button>
+        <button mat-flat-button
+                color="primary"
+                (click)="extractAll()">All player
+        </button>
+    </div>
+
+    <div *ngIf="displayList()">
+        <button mat-mini-fab
+                color="primary"
+                (click)="action = undefined">Back
+        </button>
+        <mat-form-field>
+            <input matInput (keyup)="applyFilter($event.target.value)" placeholder="Filter">
+        </mat-form-field>
+        <table mat-table [dataSource]="dataSource" class="mat-elevation-z8 player-table" matSort>
+            <!-- Position Column -->
+            <ng-container matColumnDef="firstName">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header> First Name</th>
+                <td mat-cell *matCellDef="let element"> {{element.firstName}} </td>
+            </ng-container>
+
+            <ng-container matColumnDef="lastName">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header> Last Name</th>
+                <td mat-cell *matCellDef="let element"> {{element.lastName}} </td>
+            </ng-container>
+
+            <ng-container matColumnDef="level">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header> Level</th>
+                <td mat-cell *matCellDef="let element"> {{element.level}} </td>
+            </ng-container>
+
+            <ng-container matColumnDef="country">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header> Country</th>
+                <td mat-cell *matCellDef="let element"> {{element.country}} </td>
+            </ng-container>
+
+            <ng-container matColumnDef="club">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header> Club</th>
+                <td mat-cell *matCellDef="let element"> {{element.club}} </td>
+            </ng-container>
+
+            <ng-container matColumnDef="egdpin">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header> EGD Pin</th>
+                <td mat-cell *matCellDef="let element"> {{element.egdpin}} </td>
+            </ng-container>
+
+            <ng-container matColumnDef="egcbel">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header> EGC Bel ID</th>
+                <td mat-cell *matCellDef="let element"> {{element.id}} </td>
+            </ng-container>
+
+            <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+            <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+        </table>
+    </div>
+</div>

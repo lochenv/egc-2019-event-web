@@ -5,9 +5,17 @@ import {AppRoutingModule} from './app-routing.module';
 import {AppComponent} from './app.component';
 import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 import {
-  MAT_FORM_FIELD_DEFAULT_OPTIONS,
-  MatButtonModule, MatCardModule, MatFormFieldModule, MatIconModule, MatInputModule, MatMenuModule, MatSelectModule,
-  MatToolbarModule
+    MAT_FORM_FIELD_DEFAULT_OPTIONS,
+    MatButtonModule,
+    MatCardModule,
+    MatFormFieldModule,
+    MatIconModule,
+    MatInputModule,
+    MatMenuModule,
+    MatSelectModule,
+    MatSortModule,
+    MatTableModule,
+    MatToolbarModule
 } from '@angular/material';
 import {HomeComponent} from './home/home.component';
 import {RouterModule, Routes} from '@angular/router';
@@ -17,7 +25,8 @@ import {SignInService, SubscribersService, AuthenticationInterceptor, Registrati
 import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {LoginComponent} from './login/login.component';
 import {AuthGardService} from './shared/services/auth-gard.service';
-import { ExtractListComponent } from './extract-list/extract-list.component';
+import {ExtractListComponent} from './extract-list/extract-list.component';
+import {FileSaverModule} from 'ngx-filesaver';
 
 const appRoutes: Routes = [
     {
@@ -33,6 +42,10 @@ const appRoutes: Routes = [
     {
         path: 'login',
         component: LoginComponent
+    },
+    {
+        path: 'extract-list',
+        component: ExtractListComponent
     },
     {
         path: '**',
@@ -59,6 +72,7 @@ const appRoutes: Routes = [
         FormsModule,
         ReactiveFormsModule,
         AppRoutingModule,
+        FileSaverModule,
         MatFormFieldModule,
         MatIconModule,
         MatMenuModule,
@@ -67,6 +81,8 @@ const appRoutes: Routes = [
         MatCardModule,
         MatInputModule,
         MatSelectModule,
+        MatTableModule,
+        MatSortModule,
         RouterModule
     ],
     providers: [
