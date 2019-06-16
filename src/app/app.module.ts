@@ -7,7 +7,7 @@ import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 import {
     MAT_FORM_FIELD_DEFAULT_OPTIONS,
     MatButtonModule,
-    MatCardModule,
+    MatCardModule, MatCheckboxModule,
     MatFormFieldModule,
     MatIconModule,
     MatInputModule,
@@ -83,6 +83,7 @@ const appRoutes: Routes = [
         MatSelectModule,
         MatTableModule,
         MatSortModule,
+        MatCheckboxModule,
         RouterModule
     ],
     providers: [

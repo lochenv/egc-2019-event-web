@@ -1,4 +1,4 @@
-import {AfterViewInit, Component, OnInit, ViewChild} from '@angular/core';
+import {AfterViewInit, Component, OnInit, QueryList, ViewChildren} from '@angular/core';
 import {SubscribersService} from '../shared/services';
 import {PlayerEntry} from '../shared/domain/player-entry';
 import {ExtractListAction} from '../shared/enums';
@@ -6,6 +6,8 @@ import {FileSaverService} from 'ngx-filesaver';
 import {from, of} from 'rxjs';
 import {map, mergeMap} from 'rxjs/operators';
 import {MatSort, MatTableDataSource} from '@angular/material';
+import {SelectionModel} from '@angular/cdk/collections';
+
 
 @Component({
     selector: 'app-extract-list',
@@ -22,23 +24,34 @@ export class ExtractListComponent implements OnInit, AfterViewInit {
 
     public dataSource: MatTableDataSource<PlayerEntry>;
 
-    @ViewChild(MatSort)
-    public sort: MatSort;
+    /* Cannot use View child because the table is in a *ngIf */
+    @ViewChildren(MatSort)
+    public sorts: QueryList<MatSort>;
+
+    public selection = new SelectionModel<PlayerEntry>(true, []);
 
     constructor(private subscriberService: SubscribersService,
                 private fileSaverService: FileSaverService) {
     }
 
     public ngOnInit(): void {
-        this.displayedColumns = ['lastName', 'firstName', 'level', 'country', 'club', 'egdpin', 'egcbel'];
+        this.displayedColumns = ['select', 'lastName', 'firstName', 'level', 'country', 'club', 'egdpin', 'id'];
         this.subscriberService.getSubscribers()
             .subscribe({
                 next: (players: PlayerEntry[]) => {
                     this.players = players;
                     this.dataSource = new MatTableDataSource(this.players);
-                    this.dataSource.sort = this.sort;
                 }
             });
+    }
+
+    public ngAfterViewInit(): void {
+        this.sorts.changes.subscribe((components: QueryList<MatSort>) => {
+            console.log('>>> changed', components, components.first, this.dataSource.sort);
+            if (typeof this.dataSource.sort === 'undefined' || this.dataSource.sort === null) {
+                this.dataSource.sort = components.first;
+            }
+        });
     }
 
     public setDisplayList(): void {
@@ -51,6 +64,10 @@ export class ExtractListComponent implements OnInit, AfterViewInit {
 
     public extractAll(): void {
         this.generateFile(this.players);
+    }
+
+    public extractCustom(): void {
+        this.generateFile(this.selection.selected);
     }
 
     private generateFile(players: PlayerEntry[]): void {
@@ -120,7 +137,29 @@ export class ExtractListComponent implements OnInit, AfterViewInit {
         this.dataSource.filter = filterValue.trim().toLowerCase();
     }
 
-    ngAfterViewInit(): void {
-        console.log('Sort ?', this.sort);
+    /** Whether the number of selected elements matches the total number of rows. */
+    public isAllSelected() {
+        const numSelected = this.selection.selected.length;
+        const numRows = this.dataSource.data.length;
+        return numSelected === numRows;
+    }
+
+    /** Selects all rows if they are not all selected; otherwise clear selection. */
+    public masterToggle() {
+        this.isAllSelected() ?
+            this.selection.clear() :
+            this.dataSource.data.forEach(row => this.selection.select(row));
+    }
+
+    /** The label for the checkbox on the passed row */
+    public checkboxLabel(row?: PlayerEntry): string {
+        if (!row) {
+            return `${this.isAllSelected() ? 'select' : 'deselect'} all`;
+        }
+        return `${this.selection.isSelected(row) ? 'deselect' : 'select'} row ${row.id + 1}`;
+    }
+
+    public getNumberSelected(): number {
+        return this.selection.selected.length;
     }
 }
