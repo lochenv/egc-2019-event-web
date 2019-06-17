@@ -32,12 +32,12 @@ const appRoutes: Routes = [
     {
         path: 'home',
         component: HomeComponent,
-        canActivate: [AuthGardService]
+        // canActivate: [AuthGardService]
     },
     {
         path: 'registration',
         component: RegistrationComponent,
-        canActivate: [AuthGardService]
+        // canActivate: [AuthGardService]
     },
     {
         path: 'login',

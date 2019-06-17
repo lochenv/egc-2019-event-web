@@ -1,95 +1,146 @@
-<div class="form" [ngClass]="{ 'large-width': displayList(), 'simple-width': !displayList() }">
-    <h3>Extract player list</h3>
+<div class="form large-width">
+  <h3>
+    <div>Extract player list</div>
+    <div>You have selected <span class="high-light">{{getNumberSelected()}}</span> element(s)</div>
+  </h3>
 
-    <div *ngIf="action === undefined" class="options">
-        <button mat-flat-button
-                color="primary">Main Tournament
-        </button>
-        <button mat-flat-button
-                color="primary">Weekend Tournament
-        </button>
-        <button mat-flat-button
-                color="primary"
-                (click)="setDisplayList()">Custom choice
-        </button>
-        <button mat-flat-button
-                color="primary"
-                (click)="extractAll()">All player
-        </button>
-    </div>
+  <!-- Header with predefined filter -->
+  <div class="predefined-filter">
+    <button mat-flat-button
+            (click)="selection.clear()"
+            color="accent">
+      Clear selection
+    </button>
+    <button mat-flat-button
+            (click)="selectAll()"
+            color="accent">
+      Select All players
+    </button>
+    <button mat-flat-button
+            (click)="selectMain()"
+            color="accent">
+      Select for Main tournament
+    </button>
+    <button mat-flat-button
+            (click)="selectWeekend()"
+            color="accent">
+      Select for WE tournament
+    </button>
+  </div>
 
-    <div *ngIf="displayList()">
-        <div>Selection of {{getNumberSelected()}} element(s)</div>
-        <button mat-mini-fab
-                color="primary"
-                (click)="action = undefined">Back
-        </button>
-        <mat-form-field>
-            <input matInput (keyup)="applyFilter($event.target.value)" placeholder="Filter">
-        </mat-form-field>
-        <button mat-flat-button
+  <div class="table-list">
+    <div class="table-list-header">
+      <mat-form-field>
+        <input matInput (keyup)="applyFilter($event.target.value)" placeholder="Filter">
+      </mat-form-field>
+      <div>
+        <button mat-raised-button
                 (click)="extractCustom()"
                 color="primary">
-            Download
+          Download
         </button>
-        <table mat-table [dataSource]="dataSource" class="mat-elevation-z8 player-table" matSort>
-
-            <!-- Checkbox Column -->
-            <ng-container matColumnDef="select">
-                <th mat-header-cell *matHeaderCellDef>
-                    <!--<mat-checkbox (change)="$event ? masterToggle() : null"-->
-                                  <!--[checked]="selection.hasValue() && isAllSelected()"-->
-                                  <!--[indeterminate]="selection.hasValue() && !isAllSelected()"-->
-                                  <!--[aria-label]="checkboxLabel()">-->
-                    <!--</mat-checkbox>-->
-                </th>
-                <td mat-cell *matCellDef="let row">
-                    <mat-checkbox (click)="$event.stopPropagation()"
-                                  (change)="$event ? selection.toggle(row) : null"
-                                  [checked]="selection.isSelected(row)"
-                                  [aria-label]="checkboxLabel(row)">
-                    </mat-checkbox>
-                </td>
-            </ng-container>
-
-            <!-- Position Column -->
-            <ng-container matColumnDef="firstName">
-                <th mat-header-cell *matHeaderCellDef mat-sort-header> First Name</th>
-                <td mat-cell *matCellDef="let element"> {{element.firstName}} </td>
-            </ng-container>
-
-            <ng-container matColumnDef="lastName">
-                <th mat-header-cell *matHeaderCellDef mat-sort-header> Last Name</th>
-                <td mat-cell *matCellDef="let element"> {{element.lastName}} </td>
-            </ng-container>
-
-            <ng-container matColumnDef="level">
-                <th mat-header-cell *matHeaderCellDef mat-sort-header> Level</th>
-                <td mat-cell *matCellDef="let element"> {{element.level}} </td>
-            </ng-container>
-
-            <ng-container matColumnDef="country">
-                <th mat-header-cell *matHeaderCellDef mat-sort-header> Country</th>
-                <td mat-cell *matCellDef="let element"> {{element.country}} </td>
-            </ng-container>
-
-            <ng-container matColumnDef="club">
-                <th mat-header-cell *matHeaderCellDef mat-sort-header> Club</th>
-                <td mat-cell *matCellDef="let element"> {{element.club}} </td>
-            </ng-container>
-
-            <ng-container matColumnDef="egdpin">
-                <th mat-header-cell *matHeaderCellDef mat-sort-header> EGD Pin</th>
-                <td mat-cell *matCellDef="let element"> {{element.egdpin}} </td>
-            </ng-container>
-
-            <ng-container matColumnDef="id">
-                <th mat-header-cell *matHeaderCellDef mat-sort-header> EGC Bel ID</th>
-                <td mat-cell *matCellDef="let element"> {{element.id}} </td>
-            </ng-container>
-
-            <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-            <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
-        </table>
+      </div>
     </div>
+
+    <div class="display-columns-selection">
+      <span>Column to display : </span>
+      <div *ngFor="let col of allColumns">
+        <span>{{ col.displayName }}</span>
+        <mat-checkbox
+          [checked]="col.displayed"
+          (change)="toggleShowState($event, col)"></mat-checkbox>
+      </div>
+    </div>
+
+    <table mat-table [dataSource]="dataSource" class="mat-elevation-z8 player-table" matSort>
+      <!-- Checkbox Column -->
+      <ng-container matColumnDef="select">
+        <th mat-header-cell *matHeaderCellDef class="header-cell-button">
+          <button mat-icon-button
+                  color="accent"
+                  (click)="selectAllVisible()">
+            <mat-icon>add_circle_outline</mat-icon>
+          </button>
+          <button mat-icon-button
+                  color="accent"
+                  (click)="unselectAllVisible()">
+            <mat-icon>remove_circle_outline</mat-icon>
+          </button>
+        </th>
+        <td mat-cell *matCellDef="let row">
+          <mat-checkbox (click)="$event.stopPropagation()"
+                        (change)="$event ? selection.toggle(row) : null"
+                        [checked]="selection.isSelected(row)"
+                        [aria-label]="checkboxLabel(row)">
+          </mat-checkbox>
+        </td>
+      </ng-container>
+
+      <ng-container *ngFor="let colState of allColumns" [matColumnDef]="colState.name">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>
+          {{getColumnName(colState.name)}}
+        </th>
+        <td mat-cell *matCellDef="let element"> {{element[colState.name]}}</td>
+      </ng-container>
+
+      <!--&lt;!&ndash; First name Column &ndash;&gt;-->
+      <!--<ng-container matColumnDef="firstName">-->
+      <!--<th mat-header-cell *matHeaderCellDef mat-sort-header> {{getColumnName('firstName')}} </th>-->
+      <!--<td mat-cell *matCellDef="let element"> {{element.firstName}}</td>-->
+      <!--</ng-container>-->
+
+      <!--&lt;!&ndash; Last name Column &ndash;&gt;-->
+      <!--<ng-container matColumnDef="lastName">-->
+      <!--<th mat-header-cell *matHeaderCellDef mat-sort-header> Last Name</th>-->
+      <!--<td mat-cell *matCellDef="let element"> {{element.lastName}}</td>-->
+      <!--</ng-container>-->
+
+      <!--&lt;!&ndash; Level name Column &ndash;&gt;-->
+      <!--<ng-container matColumnDef="level">-->
+      <!--<th mat-header-cell *matHeaderCellDef mat-sort-header> Level</th>-->
+      <!--<td mat-cell *matCellDef="let element"> {{element.level}}</td>-->
+      <!--</ng-container>-->
+
+      <!--&lt;!&ndash; Country Column &ndash;&gt;-->
+      <!--<ng-container matColumnDef="event">-->
+      <!--<th mat-header-cell *matHeaderCellDef mat-sort-header> Event</th>-->
+      <!--<td mat-cell *matCellDef="let element"> {{element.event}}</td>-->
+      <!--</ng-container>-->
+
+      <!--&lt;!&ndash; Age Column &ndash;&gt;-->
+      <!--<ng-container matColumnDef="age">-->
+      <!--<th mat-header-cell *matHeaderCellDef mat-sort-header> Age</th>-->
+      <!--<td mat-cell *matCellDef="let element"> {{element.age}}</td>-->
+      <!--</ng-container>-->
+
+      <!--&lt;!&ndash; Country Column &ndash;&gt;-->
+      <!--<ng-container matColumnDef="country">-->
+      <!--<th mat-header-cell *matHeaderCellDef mat-sort-header> Country</th>-->
+      <!--<td mat-cell *matCellDef="let element"> {{element.country}}</td>-->
+      <!--</ng-container>-->
+
+      <!--&lt;!&ndash; Club Column &ndash;&gt;-->
+      <!--<ng-container matColumnDef="club">-->
+      <!--<th mat-header-cell *matHeaderCellDef mat-sort-header> Club</th>-->
+      <!--<td mat-cell *matCellDef="let element"> {{element.club}}</td>-->
+      <!--</ng-container>-->
+
+      <!--&lt;!&ndash; Egd pin Column &ndash;&gt;-->
+      <!--<ng-container matColumnDef="egdpin">-->
+      <!--<th mat-header-cell *matHeaderCellDef mat-sort-header> EGD Pin</th>-->
+      <!--<td mat-cell *matCellDef="let element"> {{element.egdpin}}</td>-->
+      <!--</ng-container>-->
+
+      <!--&lt;!&ndash; Egc bel Column &ndash;&gt;-->
+      <!--<ng-container matColumnDef="id">-->
+      <!--<th mat-header-cell *matHeaderCellDef mat-sort-header> EGC Bel ID</th>-->
+      <!--<td mat-cell *matCellDef="let element"> {{element.id}}</td>-->
+      <!--</ng-container>-->
+
+      <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+      <tr mat-row *matRowDef="let row; columns: displayedColumns;"
+          (click)="selection.toggle(row)"
+          [ngClass]="{ 'row-high-light' : selection.isSelected(row)}"></tr>
+    </table>
+  </div>
 </div>

@@ -1,16 +1,44 @@
 @import "../../styles/variables.scss";
 
+.register-small-width {
+  width: 50%;
+  min-width: 500px;
+}
+.register-wide-width {
+  width: 90%;
+  min-width: 1100px;
+}
+
+.register-left-page {
+  width: 70%;
+  padding: 0 15px;
+}
+
+.register-right-page {
+  width: 30%;
+  border-left: 2px solid $egc-primary;
+  padding: 0 15px;
+  display: flex;
+}
+
+.first-step {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  button {
+    width: 150px;
+    margin: 15px;
+  }
+}
 .form {
-  margin: 0 auto;
-  width: 500px;
-  border: $egc-primary 2px solid;
-  border-radius: 15px;
-  padding: 15px;
-  background: $egc-form-background;
+  .search-player {
+    width: 80%;
+  }
 
   .form-content {
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
   }
 
   .form-actions {

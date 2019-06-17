@@ -14,10 +14,8 @@ export class PlayerEntry {
     @autoserialize
     public email: string;
 
-    @autoserialize
     public level: string;
 
-    @autoserialize
     public age: string;
 
     @autoserialize
@@ -73,6 +71,24 @@ export class PlayerEntry {
             instance.egdpin = Number(json.egdpin);
         } else {
             instance.egdpin = undefined;
+        }
+        switch (json.age) {
+          case '+=18':
+            instance.age = 'Adult';
+            break;
+          case '-18':
+            instance.age = 'Teen';
+            break;
+          case '-12':
+            instance.age = 'Child';
+            break;
+          default:
+            instance.age = json.age;
+        }
+        if (json.level === 'No level selected') {
+          instance.level = '-'
+        } else {
+          instance.level = json.level;
         }
     }
 }

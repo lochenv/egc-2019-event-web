@@ -38,7 +38,7 @@ export class RegistrationComponent implements OnInit {
             });
         this.currentStep = 0;
 
-        this.ageOptions = ['Equal or more than 18', 'Less than 18', 'Less than 12'];
+        this.ageOptions = ['Adult', 'Teen', 'Child'];
         this.isoCodeOptions = [];
 
         this.formGroup = this.formBuilder.group({
@@ -60,7 +60,7 @@ export class RegistrationComponent implements OnInit {
             ],
             level: [
                 '',
-                [Validators.required, Validators.pattern(/^(\d{1,2}[k]|\d[d])$/)]
+                [Validators.required, Validators.pattern(/^(\d{1,2}[k]|\d[dp])$/)]
             ],
             country: [
                 '',
@@ -99,7 +99,7 @@ export class RegistrationComponent implements OnInit {
             }
         }
         if (this.formGroup.get('searchPin').valid && foundPlayer) {
-            if (foundPlayer.egdpin !== 0) {
+            if (foundPlayer.egdpin && foundPlayer.egdpin !== 0) {
                 this.subscribersService.getPlayerFromEgd(foundPlayer.egdpin)
                     .subscribe(
                         (value: any) => console.log('From EGD', value)
@@ -107,7 +107,17 @@ export class RegistrationComponent implements OnInit {
             }
             this.formGroup.markAsPristine();
             this.formGroup.get('firstName').setValue(foundPlayer.firstName);
+            this.formGroup.get('lastName').setValue(foundPlayer.lastName);
+            this.formGroup.get('age').setValue(foundPlayer.age);
+            this.formGroup.get('email').setValue(foundPlayer.email);
+            this.formGroup.get('level').setValue(foundPlayer.level);
+            this.formGroup.get('country').setValue(foundPlayer.country); // TODO Land or isoCode ?
+            this.formGroup.get('egdPin').setValue(foundPlayer.egdpin);
+
             this.currentStep = 2;
+        } else {
+          console.log('Player not found', searchPin);
+          this.formGroup.get('searchPin').setErrors({ "Player not found": true});
         }
     }
 

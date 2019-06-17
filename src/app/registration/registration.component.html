@@ -1,27 +1,28 @@
-<form class="form" [formGroup]="formGroup" novalidate (ngSubmit)="register()">
+<form class="form" [ngClass]="{ ' register-wide-width' : currentStep === 2, 'register-small-width' : currentStep < 2}" [formGroup]="formGroup" novalidate (ngSubmit)="register()">
     <h3>Registration form</h3>
 
     <!-- First ask if new or existing -->
-    <div *ngIf="currentStep === 0">
-        <button (click)="currentStep = 2">New</button>
-        <button (click)="currentStep = 1">Pre-registered</button>
+    <div *ngIf="currentStep === 0" class="first-step">
+        <button (click)="currentStep = 2" mat-flat-button color="primary">New</button>
+        <button (click)="currentStep = 1" mat-flat-button color="primary">Pre-registered</button>
     </div>
 
     <div *ngIf="currentStep === 1">
 
-        <mat-form-field>
+        <mat-form-field class="search-player">
             <mat-label>Enter EGCBel or EGDPin</mat-label>
             <input matInput
                    formControlName="searchPin"
                    type="text"
+                   placeholder="Example: egcbel315 or 14286217"
                    required>
         </mat-form-field>
 
-        <button (click)="findAndNext()">Next</button>
     </div>
 
     <div class="form-content" *ngIf="currentStep === 2">
 
+      <div class="register-left-page">
         <!--
         First page or left part
           Name + First 1 champ + Tranche d'age (défault +18)
@@ -107,10 +108,29 @@
                        required>
             </mat-form-field>
         </div>
+      </div>
+
+      <div class="register-right-page">
+        <div>
+          First Week
+        </div>
+        <div>
+          Week end
+        </div>
+        <div>
+          Second Week
+        </div>
+      </div>
     </div>
 
     <div class="form-actions">
-        <button mat-flat-button
+      <button *ngIf="currentStep == 1"
+              mat-flat-button
+              (click)="findAndNext()"
+              color="primary">Next
+      </button>
+        <button *ngIf="currentStep == 2"
+                mat-flat-button
                 type="submit"
                 color="primary">Register
         </button>

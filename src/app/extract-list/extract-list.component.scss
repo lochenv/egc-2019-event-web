@@ -1,7 +1,31 @@
 @import "../../styles/variables.scss";
 
-.simple-width {
-  width: 500px;
+h3 {
+  display: flex;
+
+  div:first-child {
+    flex: 1;
+  }
+
+  div:last-child {
+    font-size: .85em;
+  }
+
+  .high-light {
+    color: #53CF88;
+    font-weight: bold;
+    font-size: 1.1em;
+  }
+}
+
+.predefined-filter {
+  display: flex;
+  margin: 10px auto;
+
+  button {
+    margin: 0 5px;
+    flex: 1;
+  }
 }
 
 .large-width {
@@ -10,16 +34,8 @@
 }
 
 .player-table {
-  width: 90%;
+  width: 95%;
   margin: 0 auto;
-}
-
-.form {
-  margin: 0 auto;
-  border: $egc-primary 2px solid;
-  border-radius: 15px;
-  padding: 15px;
-  background: $egc-form-background;
 }
 
 .options {
@@ -30,5 +46,49 @@
 
   button {
     margin: 10px;
+  }
+}
+
+.table-list {
+  .display-columns-selection {
+    border: 1px solid $egc-primary;
+    border-radius: 10px;
+    padding: 15px;
+    width: 80%;
+    margin: 10px auto;
+    display: flex;
+
+    * {
+      margin: 0 2px;
+    }
+
+    div {
+      flex: 1;
+    }
+  }
+
+  .header-cell-button {
+    margin: 0;
+    padding: 0;
+
+    .mat-icon-button {
+      width: 35px;
+      height: 35px;
+    }
+  }
+  .table-list-header {
+    display: flex;
+    align-content: center;
+    align-items: center;
+    * {
+      margin: 0 5px;
+    }
+    mat-form-field {
+      flex: 1
+    }
+  }
+
+  .row-high-light {
+    background: $egc-row-high-light;
   }
 }

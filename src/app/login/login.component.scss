@@ -1,12 +1,7 @@
 @import "../../styles/variables.scss";
 
-.form {
-  margin: 0 auto;
+.login-width {
   width: 250px;
-  border: $egc-primary 2px solid;
-  border-radius: 15px;
-  padding: 15px;
-  background: $egc-form-background;
 }
 
 .form-content {
