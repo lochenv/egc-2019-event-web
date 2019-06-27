@@ -8,7 +8,8 @@ import {MatCheckboxChange, MatDialog, MatSort, MatTableDataSource} from '@angula
 import {SelectionModel} from '@angular/cdk/collections';
 import {ConfirmDownloadDialogComponent} from '../confirm-download-dialog/confirm-download-dialog.component';
 
-// import {TextEncoder as TextEncoder} from 'utf8-encoding';
+// import TextEncoder from 'utf8-encoding/utf8-encoding';
+// import {TextEncoder} from 'utf8-encoding';
 
 @Component({
     selector: 'app-extract-list',

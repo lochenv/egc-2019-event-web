@@ -1,139 +1,318 @@
-<form class="form" [ngClass]="{ ' register-wide-width' : currentStep === 2, 'register-small-width' : currentStep < 2}" [formGroup]="formGroup" novalidate (ngSubmit)="register()">
-    <h3>Registration form</h3>
+<form class="form" [ngClass]="{ ' register-wide-width' : currentStep === 2, 'register-small-width' : currentStep < 2}"
+      [formGroup]="formGroup" novalidate (ngSubmit)="register()">
+  <h3>Registration form</h3>
 
-    <!-- First ask if new or existing -->
-    <div *ngIf="currentStep === 0" class="first-step">
-        <button (click)="currentStep = 2" mat-flat-button color="primary">New</button>
-        <button (click)="currentStep = 1" mat-flat-button color="primary">Pre-registered</button>
-    </div>
+  <!-- First ask if new or existing -->
+  <div *ngIf="currentStep === 0" class="first-step">
+    <button (click)="currentStep = 2" mat-flat-button color="primary">New</button>
+    <button (click)="currentStep = 1" mat-flat-button color="primary">Pre-registered</button>
+  </div>
 
-    <div *ngIf="currentStep === 1">
+  <div *ngIf="currentStep === 1">
 
-        <mat-form-field class="search-player">
-            <mat-label>Enter EGCBel or EGDPin</mat-label>
-            <input matInput
-                   formControlName="searchPin"
-                   type="text"
-                   placeholder="Example: egcbel315 or 14286217"
-                   required>
+    <mat-form-field class="search-player">
+      <mat-label>Enter EGCBel or EGDPin</mat-label>
+      <input matInput
+             formControlName="searchPin"
+             type="text"
+             placeholder="Example: egcbel315 or 14286217"
+             required>
+    </mat-form-field>
+
+  </div>
+
+  <div class="form-content" *ngIf="currentStep === 2">
+
+    <div class="register-left-page">
+      <!--
+      First page or left part
+        Name + First 1 champ + Tranche d'age (défault +18)
+        Country (iSOCODE ?) + Level + EGD PIN
+        Email + Receive notification
+        Club + Phone
+      Second page or right (see template)
+        First Week | Week-end | Second Week
+        X (Date)   | X (Date) | X (Date)
+        X (Date)   | X (Date) | X (Date)
+        X (Date)   | X (Date) | X (Date)
+        X (Date)   | X (Date) | X (Date)
+        X (Date)   | X (Date) | X (Date)
+      -->
+      <!-- First Line -->
+      <div class="form-line">
+
+        <!-- First Name -->
+        <mat-form-field class="full-name">
+          <mat-label>First Name</mat-label>
+          <input matInput
+                 formControlName="firstName"
+                 type="text"
+                 required>
         </mat-form-field>
 
-    </div>
+        <!-- Last Name -->
+        <mat-form-field class="full-name">
+          <mat-label>Last Name</mat-label>
+          <input matInput
+                 formControlName="lastName"
+                 type="text"
+                 required>
+        </mat-form-field>
 
-    <div class="form-content" *ngIf="currentStep === 2">
-
-      <div class="register-left-page">
-        <!--
-        First page or left part
-          Name + First 1 champ + Tranche d'age (défault +18)
-          Country (iSOCODE ?) + Level + EGD PIN
-          Email + Receive notification
-          Club + Phone
-        Second page or right (see template)
-          First Week | Week-end | Second Week
-          X (Date)   | X (Date) | X (Date)
-          X (Date)   | X (Date) | X (Date)
-          X (Date)   | X (Date) | X (Date)
-          X (Date)   | X (Date) | X (Date)
-          X (Date)   | X (Date) | X (Date)
-        -->
-        <!-- First Line -->
-        <div class="form-line">
-            <!-- First Name -->
-            <mat-form-field class="full-name">
-                <mat-label>First Name</mat-label>
-                <input matInput
-                       formControlName="firstName"
-                       type="text"
-                       required>
-            </mat-form-field>
-            <!-- First Name -->
-            <mat-form-field class="full-name">
-                <mat-label>Last Name</mat-label>
-                <input matInput
-                       formControlName="lastName"
-                       type="text"
-                       required>
-            </mat-form-field>
-            <mat-form-field>
-                <mat-label>Age</mat-label>
-                <mat-select formControlName="age"
-                            required>
-                    <mat-option *ngFor="let ageOption of ageOptions" [value]="ageOption">
-                        {{ ageOption }}
-                    </mat-option>
-                </mat-select>
-            </mat-form-field>
+        <!-- Egcbel -->
+        <div class="read-only-field">
+          <ng-container *ngIf="selectedPlayer"><span class="field-title"> EGCBel </span>{{ selectedPlayer.id }}
+          </ng-container>
         </div>
 
-        <!-- Second line -->
-        <div class="form-line">
-            <!-- Country -->
-            <mat-form-field class="small-input">
-                <mat-label>Country</mat-label>
-                <input matInput
-                       formControlName="country"
-                       type="text"
-                       required>
-            </mat-form-field>
-
-            <!-- Level -->
-            <mat-form-field class="small-input">
-                <mat-label>Level</mat-label>
-                <input matInput
-                       formControlName="level"
-                       placeholder="25k, 5k or 7d"
-                       type="text"
-                       required>
-            </mat-form-field>
-
-            <!-- Level -->
-            <mat-form-field class="full-name">
-                <mat-label>EGD Pin</mat-label>
-                <input matInput
-                       placeholder="8 digits"
-                       formControlName="egdPin"
-                       type="text"
-                       required>
-            </mat-form-field>
-        </div>
-
-        <!-- Third line -->
-        <div class="form-line">
-            <mat-form-field>
-                <mat-label>E-mail address</mat-label>
-                <input matInput
-                       formControlName="email"
-                       type="text"
-                       required>
-            </mat-form-field>
-        </div>
+        <!-- Age -->
+        <mat-form-field>
+          <mat-label>Age</mat-label>
+          <mat-select formControlName="age"
+                      required>
+            <mat-option *ngFor="let ageOption of ageOptions" [value]="ageOption">
+              {{ ageOption }}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
       </div>
 
-      <div class="register-right-page">
-        <div>
+      <!-- Second line -->
+      <div class="form-line">
+        <!-- Country -->
+        <mat-form-field class="small-input">
+          <mat-label>Country</mat-label>
+          <input matInput
+                 formControlName="country"
+                 type="text"
+                 required>
+        </mat-form-field>
+
+        <!-- Level -->
+        <mat-form-field class="small-input">
+          <mat-label>Level</mat-label>
+          <input matInput
+                 formControlName="level"
+                 placeholder="25k, 5k or 7d"
+                 type="text"
+                 required>
+        </mat-form-field>
+
+        <!-- Level -->
+        <mat-form-field class="full-name">
+          <mat-label>EGD Pin</mat-label>
+          <input matInput
+                 placeholder="8 digits"
+                 formControlName="egdPin"
+                 type="text"
+                 required>
+        </mat-form-field>
+      </div>
+
+      <!-- Third line -->
+      <div class="form-line">
+
+        <!-- Email -->
+        <mat-form-field class="full-name">
+          <mat-label>E-mail address</mat-label>
+          <input matInput
+                 formControlName="email"
+                 type="text"
+                 required>
+        </mat-form-field>
+
+        <!-- Notification -->
+        <mat-checkbox color="primary" labelPosition="before" class="field-title">Notification ?</mat-checkbox>
+      </div>
+
+      <!-- Fourth line -->
+      <div class="form-line">
+
+        <!-- Club -->
+        <mat-form-field>
+          <mat-label>(Club)</mat-label>
+          <input matInput
+                 formControlName="email"
+                 type="text">
+        </mat-form-field>
+
+        <!-- Phone -->
+        <mat-form-field>
+          <mat-label>(Phone)</mat-label>
+          <input matInput
+                 formControlName="email"
+                 type="text">
+        </mat-form-field>
+      </div>
+
+      <!-- Fifth line -->
+      <div class="form-line">
+
+        <!-- Registration date -->
+        <mat-form-field>
+          <mat-label>Registration Date</mat-label>
+          <input matInput
+                 [readonly]="true"
+                 formControlName="email"
+                 type="text">
+        </mat-form-field>
+
+        <!-- Events -->
+        <div class="read-only-field event-field">
+          <div>
+            <mat-checkbox color="primary"
+                          labelPosition="before"
+                          class="field-title"
+                          formControlName="firstWeekCheck"
+                          (change)="toggleTournamentOptions()">
+              1st week
+            </mat-checkbox>
+          </div>
+          <div>
+            <mat-checkbox color="primary"
+                          labelPosition="before"
+                          class="field-title"
+                          formControlName="weekendCheck"
+                          (change)="toggleTournamentOptions()">
+              Week end
+            </mat-checkbox>
+          </div>
+          <div>
+            <mat-checkbox color="primary"
+                          labelPosition="before"
+                          class="field-title"
+                          formControlName="secondWeekCheck"
+                          (change)="toggleTournamentOptions()">
+              2nd week
+            </mat-checkbox>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="register-right-page">
+      <div>
+        <h3>
           First Week
-        </div>
-        <div>
-          Week end
-        </div>
-        <div>
-          Second Week
+        </h3>
+
+        <div class="tournament-options">
+          <!-- Main -->
+          <ul>
+            <li class="tournament-title">Main</li>
+            <li *ngFor="let option of mainFirstWeekOptions">
+              <div>
+                <mat-checkbox [checked]="option.played"
+                              labelPosition="before"
+                              color="primary"
+                              [disabled]="option.disabled">
+                  <span *ngIf="option.title" class="field-title">
+                    {{ option.title }}
+                  </span>
+                  {{ option.label }}
+                </mat-checkbox>
+              </div>
+            </li>
+          </ul>
+          <!-- Rapid -->
+          <ul>
+            <li class="tournament-title">Rapid</li>
+            <li *ngFor="let option of rapidFirstWeekOptions">
+              <div>
+                <mat-checkbox [checked]="option.played"
+                              labelPosition="before"
+                              color="primary"
+                              [disabled]="option.disabled">
+                  <span *ngIf="option.title" class="field-title">
+                    {{ option.title }}
+                  </span>
+                  {{ option.label }}
+                </mat-checkbox>
+              </div>
+            </li>
+          </ul>
         </div>
       </div>
-    </div>
 
-    <div class="form-actions">
-      <button *ngIf="currentStep == 1"
-              mat-flat-button
-              (click)="findAndNext()"
-              color="primary">Next
-      </button>
-        <button *ngIf="currentStep == 2"
-                mat-flat-button
-                type="submit"
-                color="primary">Register
-        </button>
+      <div>
+        <h3>
+          Second Week
+        </h3>
+        <div class="tournament-options">
+          <!-- Main -->
+          <ul>
+            <li class="tournament-title">Main</li>
+            <li *ngFor="let option of mainSecondWeekOptions">
+              <div>
+                <mat-checkbox [checked]="option.played"
+                              labelPosition="before"
+                              color="primary"
+                              [disabled]="option.disabled">
+                  <span *ngIf="option.title" class="field-title">
+                    {{ option.title }}
+                  </span>
+                  {{ option.label }}
+                </mat-checkbox>
+              </div>
+            </li>
+          </ul>
+          <!-- Rapid -->
+          <ul>
+            <li class="tournament-title">Rapid</li>
+            <li *ngFor="let option of rapidSecondWeekOptions">
+              <div>
+                <mat-checkbox [checked]="option.played"
+                              labelPosition="before"
+                              color="primary"
+                              [disabled]="option.disabled">
+                  <span *ngIf="option.title" class="field-title">
+                    {{ option.title }}
+                  </span>
+                  {{ option.label }}
+                </mat-checkbox>
+              </div>
+            </li>
+          </ul>
+        </div>
+      </div>
+      <div>
+        <h3>
+          Other events
+        </h3>
+        <div class="tournament-options">
+          <!-- Main -->
+          <ul>
+            <li *ngFor="let option of otherEventOptions">
+              <div>
+                <mat-checkbox [checked]="option.played"
+                              labelPosition="before"
+                              color="primary"
+                              [disabled]="option.disabled">
+                  <span *ngIf="option.title" class="field-title">
+                    {{ option.title }}
+                  </span>
+                  {{ option.label }}
+                </mat-checkbox>
+              </div>
+            </li>
+          </ul>
+        </div>
+      </div>
+
     </div>
+  </div>
+
+  <div class="form-actions">
+    <button *ngIf="currentStep == 1"
+            mat-flat-button
+            (click)="findAndNext()"
+            color="primary">Next
+    </button>
+    <button *ngIf="currentStep == 2"
+            mat-flat-button
+            type="submit"
+            color="primary">Register
+    </button>
+  </div>
 </form>
 
