@@ -7,7 +7,8 @@ import {map, mergeMap} from 'rxjs/operators';
 import {MatCheckboxChange, MatSort, MatTableDataSource} from '@angular/material';
 import {SelectionModel} from '@angular/cdk/collections';
 
-// import {TextEncoder as TextEncoder} from 'utf8-encoding';
+// import TextEncoder from 'utf8-encoding/utf8-encoding';
+// import {TextEncoder} from 'utf8-encoding';
 
 @Component({
   selector: 'app-extract-list',

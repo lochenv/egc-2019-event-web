@@ -7,7 +7,9 @@
     "build": "ng build",
     "test": "ng test",
     "lint": "ng lint",
-    "e2e": "ng e2e"
+    "e2e": "ng e2e",
+    "ngc": "ngc",
+    "tsc": "tsc"
   },
   "private": true,
   "dependencies": {
@@ -23,6 +25,7 @@
     "@angular/router": "~7.2.0",
     "@types/file-saver": "^2.0.0",
     "@types/crypto-js": "^3.1.9-1",
+    "@types/node": "^8.9.5",
     "core-js": "^2.5.4",
     "utf8-encoding": "^0.1.2",
     "crypto-js": "^3.1.9-1",
@@ -42,7 +45,6 @@
     "@types/hammerjs": "~2.0.8",
     "@types/jasmine": "~2.8.8",
     "@types/jasminewd2": "~2.0.3",
-    "@types/node": "~8.9.4",
     "codelyzer": "~4.5.0",
     "jasmine-core": "~2.99.1",
     "jasmine-spec-reporter": "~4.2.1",
