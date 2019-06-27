@@ -7,11 +7,11 @@ import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 import {
     MAT_FORM_FIELD_DEFAULT_OPTIONS,
     MatButtonModule,
-    MatCardModule, MatCheckboxModule,
+    MatCardModule, MatCheckboxModule, MatDialogModule,
     MatFormFieldModule,
     MatIconModule,
     MatInputModule,
-    MatMenuModule,
+    MatMenuModule, MatProgressSpinnerModule,
     MatSelectModule,
     MatSortModule,
     MatTableModule,
@@ -27,6 +27,7 @@ import {LoginComponent} from './login/login.component';
 import {AuthGardService} from './shared/services/auth-gard.service';
 import {ExtractListComponent} from './extract-list/extract-list.component';
 import {FileSaverModule} from 'ngx-filesaver';
+import { ConfirmDownloadDialogComponent } from './confirm-download-dialog/confirm-download-dialog.component';
 
 const appRoutes: Routes = [
     {
@@ -59,7 +60,8 @@ const appRoutes: Routes = [
         HomeComponent,
         RegistrationComponent,
         LoginComponent,
-        ExtractListComponent
+        ExtractListComponent,
+        ConfirmDownloadDialogComponent
     ],
     imports: [
         RouterModule.forRoot(
@@ -84,7 +86,12 @@ const appRoutes: Routes = [
         MatTableModule,
         MatSortModule,
         MatCheckboxModule,
+        MatProgressSpinnerModule,
+        MatDialogModule,
         RouterModule
+    ],
+    entryComponents: [
+        ConfirmDownloadDialogComponent
     ],
     providers: [
         SubscribersService,

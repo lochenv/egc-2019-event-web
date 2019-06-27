@@ -92,3 +92,14 @@ h3 {
     background: $egc-row-high-light;
   }
 }
+
+.center {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 25px;
+
+  mat-spinner {
+    margin: 25px;
+  }
+}
