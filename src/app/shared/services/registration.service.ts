@@ -1,8 +1,7 @@
 import {HttpClient} from '@angular/common/http';
-import {baseUri} from '../constant';
 import {Injectable} from '@angular/core';
 
-const uri = baseUri + 'e-mail';
+const uri = 'http://localhost/egc2019php/subscribers/insert.php';
 
 @Injectable()
 export class RegistrationService {
@@ -11,7 +10,7 @@ export class RegistrationService {
     }
 
     public register(): void {
-        this.httpClient.get(uri).subscribe(
+        this.httpClient.post(uri, {observe: 'response'}).subscribe(
             (value: any) => console.log('Yes it works', value),
             (error: any) => console.log('Oh no too bad', error)
         );

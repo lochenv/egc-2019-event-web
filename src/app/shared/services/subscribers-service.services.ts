@@ -13,6 +13,9 @@ export class SubscribersService {
 
   private subscribersUri = 'http://egc2019.eu/congress/registered-participants?' +
     'export=true&token=rJV2P0HxWp8XaofbgN4dy2hc26ijB5WZz0nsKLpz7q2nA';
+
+  private localsubscriber = 'http://localhost/egc2019php/subscribers/read.php';
+
   private egdUri = 'http://www.europeangodatabase.eu/EGD/GetPlayerDataByPIN.php';
 
   public constructor(private httpClient: HttpClient) {
@@ -21,25 +24,24 @@ export class SubscribersService {
 
   public getSubscribers(): Observable<PlayerEntry[]> {
     // TestPurpose
-    return of(stub_file)
+    // return of(stub_file)
+    //   .pipe(
+    //     take(1),
+    //     map((data: PlayerEntry[]) => {
+    //       return data.map(jsonEntry => {
+    //         return Deserialize(jsonEntry, PlayerEntry);
+    //       });
+    //     })
+    //   );
+    return this.httpClient.get(this.localsubscriber, {observe: 'response'})
       .pipe(
         take(1),
-        map((data: PlayerEntry[]) => {
-          return data.map(jsonEntry => {
+        map((data: HttpResponse<PlayerEntry[]>) => {
+          return data.body.map(jsonEntry => {
             return Deserialize(jsonEntry, PlayerEntry);
           });
         })
       );
-    // return this.httpClient.get(this.subscribersUri, {observe: 'response'})
-    //   .pipe(
-    //     take(1),
-    //     map((data: HttpResponse<PlayerEntry[]>) => {
-    //       return data.body.map(jsonEntry => {
-    //         const instance: PlayerEntry = Deserialize(jsonEntry, PlayerEntry);
-    //         return instance;
-    //       });
-    //     })
-    //   );
   }
 
   public enrichPlayerWithEgd(player: PlayerEntry): Observable<PlayerEntry> {

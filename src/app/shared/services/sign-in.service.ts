@@ -4,14 +4,14 @@ import {SignInRequest, UserEntity} from '../domain';
 import {take} from 'rxjs/operators';
 import {BehaviorSubject, Observable} from 'rxjs';
 import {Router} from '@angular/router';
-import {baseUri} from '../constant';
+import {javaUri} from '../../../environments/environment';
 
 const EGC_USER_KEY = 'egcCurrentUser';
 
 @Injectable()
 export class SignInService {
 
-    private signInUrl = baseUri + 'authenticate';
+    private signInUrl = javaUri + 'authenticate';
 
     private currentUserSubject: BehaviorSubject<UserEntity>;
     public currentUser: Observable<UserEntity>;
@@ -28,7 +28,7 @@ export class SignInService {
     }
 
     public signIn(signInRequest: SignInRequest): void {
-        console.log('Trying to sign in', signInRequest);
+        console.log('Trying to sign in', signInRequest, ' on ', this.signInUrl);
 
         this.httpClient.post(this.signInUrl, signInRequest)
             .pipe(
@@ -36,8 +36,9 @@ export class SignInService {
             ).subscribe({
             next: this.storeUser.bind(this),
             error: this.handleError,
-            complete: () => this.router.navigate(['/home'])
+            complete: () => console.log('Authenticated')
         });
+        // this.router.navigate(['/home']
     }
 
     public logout() {
