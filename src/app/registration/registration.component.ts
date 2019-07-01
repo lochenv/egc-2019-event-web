@@ -275,7 +275,7 @@ export class RegistrationComponent implements OnInit {
 
   public register(): void {
     console.log('Registering');
-    this.registerService.register();
+    this.registerService.register(this.selectedPlayer);
   }
 
   public toggleTournamentOptions(): void {
