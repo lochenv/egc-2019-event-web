@@ -100,6 +100,13 @@
       margin-right: 20px;
     }
 
+    mat-radio-button {
+      margin: 0 5px;
+      * {
+        margin: 0 5px;
+      }
+    }
+
     mat-form-field:last-child {
       margin-right: inherit;
     }

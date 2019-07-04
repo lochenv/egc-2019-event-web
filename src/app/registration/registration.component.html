@@ -4,7 +4,7 @@
 
   <!-- First ask if new or existing -->
   <div *ngIf="currentStep === 0" class="first-step">
-    <button (click)="currentStep = 2" mat-flat-button color="primary">New</button>
+    <button (click)="createNewPlayer()" mat-flat-button color="primary">New</button>
     <button (click)="currentStep = 1" mat-flat-button color="primary">Pre-registered</button>
   </div>
 
@@ -15,8 +15,11 @@
       <input matInput
              formControlName="searchPin"
              type="text"
-             placeholder="Example: egcbel315 or 14286217"
+             placeholder="Example: 315 or 14286217"
              required>
+      <mat-error *ngIf="!formGroup.controls['searchPin'].valid">
+        <div>{{ getErrorMessage( 'searchPin') }}</div>
+      </mat-error>
     </mat-form-field>
 
   </div>
@@ -122,7 +125,34 @@
         </mat-form-field>
 
         <!-- Notification -->
-        <mat-checkbox color="primary" labelPosition="before" class="field-title">Notification ?</mat-checkbox>
+        <div class="read-only-field">
+          <!-- hack suggested: https://github.com/angular/components/issues/7891 -->
+          <mat-form-field>
+          <mat-label>Notification ?</mat-label>
+            <input matInput
+                   type="text"
+                   formControlName="notification"
+                   style="visibility: hidden"/>
+          <mat-radio-group formControlName="notification">
+            <mat-radio-button
+              [value]="true"
+              color="primary"
+              labelPosition="before">
+              Yes
+            </mat-radio-button>
+            <mat-radio-button
+              [value]="false"
+              color="primary"
+              labelPosition="before">
+              No
+            </mat-radio-button>
+          </mat-radio-group>
+          </mat-form-field>
+          <mat-error *ngIf="!formGroup.controls['notification'].valid">
+            <div>{{ getErrorMessage( 'notification') }}</div>
+          </mat-error>
+        </div>
+        <!--<mat-checkbox color="primary" labelPosition="before" class="field-title">Notification ?</mat-checkbox>-->
       </div>
 
       <!-- Fourth line -->
@@ -132,7 +162,7 @@
         <mat-form-field>
           <mat-label>(Club)</mat-label>
           <input matInput
-                 formControlName="email"
+                 formControlName="club"
                  type="text">
         </mat-form-field>
 
@@ -140,7 +170,7 @@
         <mat-form-field>
           <mat-label>(Phone)</mat-label>
           <input matInput
-                 formControlName="email"
+                 formControlName="phone"
                  type="text">
         </mat-form-field>
       </div>
@@ -153,7 +183,7 @@
           <mat-label>Registration Date</mat-label>
           <input matInput
                  [readonly]="true"
-                 formControlName="email"
+                 [value]="formGroup.controls['registrationDate']?.value | date: 'yyyy/MM/dd HH:mm:ss'"
                  type="text">
         </mat-form-field>
 
@@ -188,8 +218,37 @@
           </div>
         </div>
       </div>
+
+      <!-- Sixth line -->
+      <div class="form-line">
+        <mat-form-field>
+          <mat-label>
+            Remarks
+          </mat-label>
+          <input
+            matInput
+            type="text"
+            formControlName="remarks"/>
+        </mat-form-field>
+      </div>
     </div>
 
+    <!-- Seventh line -->
+    <div class="form-line">
+      <!-- paid + date -->
+      <div class="read-only-field">
+        <mat-checkbox color="primary"
+                      formControlName="paid"
+                      labelPosition="before">Paid ?
+        </mat-checkbox>
+      </div>
+      <mat-form-field>
+        <mat-label>Date of Payment</mat-label>
+        <input [readonly]="true"
+               [value]="formGroup.controls['dateOfPayment']?.value | date: 'yyyy/MM/dd'"
+               matInput/>
+      </mat-form-field>
+    </div>
     <div class="register-right-page">
       <div>
         <h3>
@@ -203,6 +262,7 @@
             <li *ngFor="let option of mainFirstWeekOptions">
               <div>
                 <mat-checkbox [checked]="option.played"
+                              (change)="toggle($event, option)"
                               labelPosition="before"
                               color="primary"
                               [disabled]="option.disabled">
@@ -285,6 +345,7 @@
             <li *ngFor="let option of otherEventOptions">
               <div>
                 <mat-checkbox [checked]="option.played"
+                              (change)="option.toggle($event)"
                               labelPosition="before"
                               color="primary"
                               [disabled]="option.disabled">

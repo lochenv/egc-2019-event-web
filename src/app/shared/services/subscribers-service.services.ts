@@ -24,24 +24,24 @@ export class SubscribersService {
 
   public getSubscribers(): Observable<PlayerEntry[]> {
     // TestPurpose
-    // return of(stub_file)
-    //   .pipe(
-    //     take(1),
-    //     map((data: PlayerEntry[]) => {
-    //       return data.map(jsonEntry => {
-    //         return Deserialize(jsonEntry, PlayerEntry);
-    //       });
-    //     })
-    //   );
-    return this.httpClient.get(this.localsubscriber, {observe: 'response'})
+    return of(stub_file)
       .pipe(
         take(1),
-        map((data: HttpResponse<PlayerEntry[]>) => {
-          return data.body.map(jsonEntry => {
+        map((data: PlayerEntry[]) => {
+          return data.map(jsonEntry => {
             return Deserialize(jsonEntry, PlayerEntry);
           });
         })
       );
+    // return this.httpClient.get(this.localsubscriber, {observe: 'response'})
+    //   .pipe(
+    //     take(1),
+    //     map((data: HttpResponse<PlayerEntry[]>) => {
+    //       return data.body.map(jsonEntry => {
+    //         return Deserialize(jsonEntry, PlayerEntry);
+    //       });
+    //     })
+    //   );
   }
 
   public enrichPlayerWithEgd(player: PlayerEntry): Observable<PlayerEntry> {
