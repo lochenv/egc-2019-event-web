@@ -15,3 +15,5 @@ export const environment = {
  */
 // import 'zone.js/dist/zone-error';  // Included with Angular CLI.
 export const javaUri = 'https://egc-2019-event.herokuapp.com/api/';
+export const phpUri = 'http://localhost/egc2019php/subscribers/';
+export const egdUri = 'http://www.europeangodatabase.eu/EGD/';

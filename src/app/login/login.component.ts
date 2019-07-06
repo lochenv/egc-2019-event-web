@@ -1,8 +1,11 @@
 import {Component, HostBinding, OnInit} from '@angular/core';
 import {FormBuilder, FormGroup, Validators} from '@angular/forms';
 import {SignInService} from '../shared/services';
-import {SignInRequest} from '../shared/domain';
+import {SignInRequest, UserEntity} from '../shared/domain';
 import * as CryptoJS from 'crypto-js';
+import {MatDialog, MatSnackBar} from '@angular/material';
+import {Router} from '@angular/router';
+import {PleaseWaitDialogComponent} from '../please-wait-dialog/please-wait-dialog.component';
 
 @Component({
     selector: 'app-login',
@@ -17,7 +20,10 @@ export class LoginComponent implements OnInit {
     public loginForm: FormGroup;
 
     constructor(private formBuilder: FormBuilder,
-                private signInService: SignInService) {
+                private signInService: SignInService,
+                private snackBar: MatSnackBar,
+                private dialog: MatDialog,
+                private router: Router) {
     }
 
     ngOnInit() {
@@ -34,8 +40,10 @@ export class LoginComponent implements OnInit {
     }
 
     public login(): void {
-        console.log('Sign in requested');
         if (this.loginForm.valid) {
+            const pleaseWaitRef = this.dialog.open(PleaseWaitDialogComponent, {
+                width: '250px'
+            });
             const encPassword =
                 CryptoJS.enc.Base64.stringify(
                     CryptoJS.SHA256(this.loginForm.controls.password.value));
@@ -44,8 +52,19 @@ export class LoginComponent implements OnInit {
                 password: encPassword
             };
 
-            this.signInService.signIn(signInRequest);
+            this.signInService.signIn(signInRequest)
+                .subscribe({
+                    next: (userEntry
+                               : UserEntity) => {
+                        this.snackBar.open('User ' + userEntry.username + ' successfully logged in', 'Ok');
+                        this.router.navigate(['/home']);
+                    },
+                    complete: () => pleaseWaitRef.close()
+                });
         } else {
+            this.snackBar.open('The form contains invalid values', 'Ok', {
+                panelClass: 'snack-bar-error'
+            });
             console.log('Cannot sign is cause form is invalid', this.loginForm);
         }
 

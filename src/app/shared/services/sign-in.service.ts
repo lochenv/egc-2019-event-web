@@ -1,7 +1,7 @@
 import {Injectable} from '@angular/core';
 import {HttpClient, HttpErrorResponse} from '@angular/common/http';
 import {SignInRequest, UserEntity} from '../domain';
-import {take} from 'rxjs/operators';
+import {map, take} from 'rxjs/operators';
 import {BehaviorSubject, Observable} from 'rxjs';
 import {Router} from '@angular/router';
 import {javaUri} from '../../../environments/environment';
@@ -27,25 +27,23 @@ export class SignInService {
         return this.currentUserSubject.value;
     }
 
-    public signIn(signInRequest: SignInRequest): void {
+    public signIn(signInRequest: SignInRequest): Observable<UserEntity> {
         console.log('Trying to sign in', signInRequest, ' on ', this.signInUrl);
 
-        this.httpClient.post(this.signInUrl, signInRequest)
+        return this.httpClient.post(this.signInUrl, signInRequest)
             .pipe(
-                take(1)
-            ).subscribe({
-            next: this.storeUser.bind(this),
-            error: this.handleError,
-            complete: () => console.log('Authenticated')
-        });
-        // this.router.navigate(['/home']
+                take(1),
+                map((user: UserEntity) => {
+                    this.storeUser(user);
+                    return user;
+                })
+            );
     }
 
     public logout() {
         localStorage.removeItem(EGC_USER_KEY);
         this.currentUserSubject.next(null);
         this.router.navigate(['/login']);
-        console.log('logged out');
     }
 
     private storeUser(user: UserEntity): void {

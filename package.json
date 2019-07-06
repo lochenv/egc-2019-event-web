@@ -35,7 +35,8 @@
     "tslib": "^1.9.0",
     "zone.js": "~0.8.26",
     "file-saver": "^2.0.0",
-    "ngx-filesaver": "^2.2.1"
+    "ngx-filesaver": "^2.2.1",
+    "moment": "^2.24.0"
   },
   "devDependencies": {
     "@angular-devkit/build-angular": "~0.13.0",
