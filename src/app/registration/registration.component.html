@@ -216,6 +216,18 @@
                            type="text">
                 </mat-form-field>
 
+                <!-- Amount -->
+                <mat-form-field>
+                    <mat-label>Amount</mat-label>
+                    <input matInput
+                           formControlName="amount"
+                           type="text"
+                           required>
+                    <mat-error *ngIf="!formGroup.controls['amount'].valid">
+                        <div>{{ getErrorMessage('amount') }}</div>
+                    </mat-error>
+                </mat-form-field>
+
                 <!-- paid + date -->
                 <div class="read-only-field event-field">
                     <div>
@@ -272,10 +284,9 @@
                     <mat-label>
                         Remarks
                     </mat-label>
-                    <input
-                            matInput
-                            type="text"
-                            formControlName="remarks"/>
+                    <input matInput
+                           type="text"
+                           formControlName="remarks"/>
                 </mat-form-field>
             </div>
         </div>

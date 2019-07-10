@@ -32,14 +32,12 @@ export class AppComponent implements OnInit {
             {
                 icon: 'notifications_active',
                 label: 'Notify round',
-                stateName: 'TO_BE_DEFINED'
-            },
-            {
-                icon: 'send',
-                label: 'Send Visa invitation letter',
-                stateName: 'TO_BE_DEFINED'
+                stateName: 'notify-round'
             }
         ];
+
+        // Check if there is a Token and if it's still valid
+        this.signInService.logoutIfTokenExpired();
     }
 
     public logout(): void {

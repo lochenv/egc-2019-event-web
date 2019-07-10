@@ -34,6 +34,8 @@ import {FileSaverModule} from 'ngx-filesaver';
 import {ConfirmDownloadDialogComponent} from './confirm-download-dialog/confirm-download-dialog.component';
 import { PleaseWaitDialogComponent } from './please-wait-dialog/please-wait-dialog.component';
 import {AuthGardService} from './shared/services/auth-gard.service';
+import { NotifyRoundComponent } from './notify-round/notify-round.component';
+import {MatFileUploadModule} from 'angular-material-fileupload';
 
 const appRoutes: Routes = [
     {
@@ -53,6 +55,11 @@ const appRoutes: Routes = [
     {
         path: 'extract-list',
         component: ExtractListComponent,
+        canActivate: [AuthGardService]
+    },
+    {
+        path: 'notify-round',
+        component: NotifyRoundComponent,
         canActivate: [AuthGardService]
     },
     {
@@ -76,7 +83,8 @@ const EGC_SNACK_BAR_CONFIG: MatSnackBarConfig = {
         LoginComponent,
         ExtractListComponent,
         ConfirmDownloadDialogComponent,
-        PleaseWaitDialogComponent
+        PleaseWaitDialogComponent,
+        NotifyRoundComponent
     ],
     imports: [
         RouterModule.forRoot(
@@ -106,6 +114,7 @@ const EGC_SNACK_BAR_CONFIG: MatSnackBarConfig = {
         MatProgressSpinnerModule,
         MatDialogModule,
         MatSnackBarModule,
+        MatFileUploadModule,
         RouterModule
     ],
     entryComponents: [

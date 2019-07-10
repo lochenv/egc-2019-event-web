@@ -2,7 +2,6 @@ import {autoserialize} from 'cerialize';
 import {EgdPlayerInfo} from './egd-player-info.entity';
 import {FormGroup} from '@angular/forms';
 import * as moment from 'moment';
-import {type} from 'os';
 
 export class PlayerEntry {
     @autoserialize
@@ -16,6 +15,8 @@ export class PlayerEntry {
 
     @autoserialize
     public email: string;
+
+    public notification: boolean;
 
     public level: string;
 
@@ -41,6 +42,9 @@ export class PlayerEntry {
 
     @autoserialize
     public validated?: string;
+
+    @autoserialize
+    public amount?: number;
 
     @autoserialize
     public paid?: string;
@@ -96,10 +100,16 @@ export class PlayerEntry {
         json.weekend_tournament = instance.weekendTournament;
         json.side_event = instance.sideEvent;
         json.on_site = instance.onSite;
+        if (instance.notification) {
+            json.notification = 'yes';
+        } else {
+            json.notification = 'no';
+        }
     }
 
     public static OnDeserialized(instance: PlayerEntry, json: any): void {
         instance.id = Number(json.id);
+        instance.amount = Number(json.amount);
         instance.dateCreation = moment(json.date_creation).toDate();
         if (typeof json.date_of_payment !== 'undefined' &&
             json.date_of_payment !== null &&
@@ -111,6 +121,9 @@ export class PlayerEntry {
         instance.weekendTournament = json.weekend_tournament;
         instance.sideEvent = json.side_event;
         instance.onSite = json.on_site;
+        if (typeof json.notification !== 'undefined') {
+            instance.notification = json.notification === 'yes';
+        }
         if (json.egdpin.toString().match(/\d{8}/)) {
             instance.egdpin = Number(json.egdpin);
         } else {
@@ -145,6 +158,7 @@ export class PlayerEntry {
         this.lastName = formGroup.get('lastName').value;
         this.age = formGroup.get('age').value;
         this.email = formGroup.get('email').value;
+        this.notification = formGroup.get('notification').value;
         this.level = formGroup.get('level').value;
         this.country = formGroup.get('country').value;
         this.egdpin = formGroup.get('egdPin').value;
@@ -179,6 +193,8 @@ export class PlayerEntry {
         this.weekendTournament = weekendTournament;
         this.sideEvent = sideEvent;
         this.onSite = 'yes';
+
+        console.log('With form group', this);
     }
 
     public toFormGroup(formGroup: FormGroup): void {
@@ -186,6 +202,7 @@ export class PlayerEntry {
         formGroup.get('lastName').setValue(this.lastName);
         formGroup.get('age').setValue(this.age);
         formGroup.get('email').setValue(this.email);
+        formGroup.get('notification').setValue(this.notification);
         formGroup.get('level').setValue(this.level);
         formGroup.get('country').setValue(this.country); // TODO Land or isoCode ?
         formGroup.get('egdPin').setValue(this.egdpin);

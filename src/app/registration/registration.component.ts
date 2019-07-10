@@ -161,34 +161,34 @@ export class RegistrationComponent implements OnInit {
         },
         {
             title: '9*9 : ',
-            label: '07-21 / 07-23 (5 rounds)',
-            played: false,
-            disabled: true
-        },
-        {
-            title: 'Children : ',
-            label: '07-29 (5 rounds)',
-            played: false,
-            disabled: true
-        },
-        {
-            title: 'Ying Yang : ',
-            label: '08-02 (5 rounds)',
-            played: false,
-            disabled: true
-        },
-        {
-            title: 'Chess & Go : ',
-            label: '08-01 (x rounds)',
+            label: '07-21 / 07-23',
             played: false,
             disabled: true
         },
         {
             title: '13*13 : ',
-            label: '07-24 (4 rounds)',
+            label: '07-24',
             played: false,
             disabled: true
-        }
+        },
+        {
+            title: 'Children : ',
+            label: '07-29',
+            played: false,
+            disabled: true
+        },
+        {
+            title: 'Chess & Go : ',
+            label: '08-01',
+            played: false,
+            disabled: true
+        },
+        {
+            title: 'Ying Yang : ',
+            label: '08-02',
+            played: false,
+            disabled: true
+        },
     ];
 
     constructor(private subscribersService: SubscribersService,
@@ -250,6 +250,10 @@ export class RegistrationComponent implements OnInit {
             searchPin: [
                 '',
                 [Validators.pattern(/^(\d{1,4}|1\d{7})$/)]
+            ],
+            amount: [
+                0,
+                [Validators.required]
             ],
             registrationDate: null,
             dateOfPayment: null,

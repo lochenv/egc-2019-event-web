@@ -12,6 +12,7 @@ const EGC_USER_KEY = 'egcCurrentUser';
 export class SignInService {
 
     private signInUrl = javaUri + 'authenticate';
+    private validateUrl = javaUri + 'authenticate/valid';
 
     private currentUserSubject: BehaviorSubject<UserEntity>;
     public currentUser: Observable<UserEntity>;
@@ -46,13 +47,31 @@ export class SignInService {
         this.router.navigate(['/login']);
     }
 
+    public logoutIfTokenExpired() {
+        const storedUser: UserEntity = this.currentUserValue;
+        console.log(storedUser, this);
+        if (typeof storedUser !== 'undefined' && storedUser !== null) {
+            this.httpClient.post(this.validateUrl,
+                {
+                    bearer : storedUser.token
+                }).subscribe(
+                (response: any) => {
+                    if (typeof response.valid === 'undefined' || !response.valid) {
+                        this.logout();
+                    }
+                }
+            );
+        } else {
+            // Clean memory
+            this.logout();
+        }
+    }
+
     private storeUser(user: UserEntity): void {
-        console.log('>>> User', user);
         if (user && user.token) {
             console.log(this);
             localStorage.setItem(EGC_USER_KEY, JSON.stringify(user));
             this.currentUserSubject.next(user);
-            console.log('Setting it in the local storage');
         }
     }
 
