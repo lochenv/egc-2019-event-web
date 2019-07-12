@@ -2,7 +2,7 @@ import {Injectable} from '@angular/core';
 import {HttpClient, HttpResponse} from '@angular/common/http';
 import {catchError, map, take} from 'rxjs/operators';
 import {PlayerEntry} from '../domain/player-entry';
-import {Observable, of} from 'rxjs';
+import {Observable, of, throwError} from 'rxjs';
 import {Deserialize} from 'cerialize';
 import {EgdPlayerInfo} from '../domain/egd-player-info.entity';
 import {egdUri, phpUri} from '../../../environments/environment';
@@ -27,14 +27,32 @@ export class SubscribersService {
         //         })
         //     );
         return this.httpClient.get(phpUri + 'read.php', {observe: 'response'})
-          .pipe(
+            .pipe(
+                take(1),
+                map((data: HttpResponse<PlayerEntry[]>) => {
+                    return data.body.map(jsonEntry => {
+                        return Deserialize(jsonEntry, PlayerEntry);
+                    });
+                })
+            );
+    }
+
+    public findSubscriber(egcbel: number): Observable<PlayerEntry> {
+        return this.httpClient.get(phpUri + 'read.php',
+            {
+                params: {
+                    egcbel: egcbel + ''
+                },
+                observe: 'response'
+            }).pipe(
             take(1),
             map((data: HttpResponse<PlayerEntry[]>) => {
-              return data.body.map(jsonEntry => {
-                return Deserialize(jsonEntry, PlayerEntry);
-              });
+                const dezerialized: PlayerEntry[] = data.body.map(jsonEntry => {
+                    return Deserialize(jsonEntry, PlayerEntry);
+                });
+                return dezerialized[0];
             })
-          );
+        );
     }
 
     public enrichPlayerWithEgd(player: PlayerEntry): Observable<PlayerEntry> {

@@ -1,5 +1,8 @@
-<form class="form" [ngClass]="{ ' register-wide-width' : currentStep === 2, 'register-small-width' : currentStep < 2}"
-      [formGroup]="formGroup" novalidate (ngSubmit)="register()">
+<form class="form"
+      [ngClass]="{ ' register-wide-width' : currentStep === 2, 'register-small-width' : currentStep < 2}"
+      [formGroup]="formGroup"
+      #ngForm="ngForm"
+      novalidate>
     <h3>Registration form</h3>
 
     <!-- First ask if new or existing -->
@@ -11,14 +14,14 @@
     <div *ngIf="currentStep === 1">
 
         <mat-form-field class="search-player">
-            <mat-label>Enter EGCBel or EGDPin</mat-label>
+            <mat-label>Enter EGCBel</mat-label>
             <input matInput
-                   formControlName="searchPin"
+                   [formControl]="searchPin"
                    type="text"
-                   placeholder="Example: 315 or 14286217"
-                   required>
-            <mat-error *ngIf="!formGroup.controls['searchPin'].valid">
-                <div>{{ getErrorMessage('searchPin') }}</div>
+                   placeholder="Example: 315">
+            <mat-error *ngIf="!searchPin.valid">
+                <div *ngIf="searchPin.hasError('notfound')"> Player not found </div>
+                <div *ngIf="searchPin.hasError('pattern')"> Player egc is made of 1 to 4 digits </div>
             </mat-error>
         </mat-form-field>
 
@@ -160,8 +163,8 @@
                     <mat-form-field>
                         <mat-label>Notification ?</mat-label>
                         <input matInput
-                               type="text"
                                formControlName="notification"
+                               type="text"
                                style="visibility: hidden"/>
                         <mat-radio-group formControlName="notification">
                             <mat-radio-button
@@ -178,7 +181,7 @@
                             </mat-radio-button>
                         </mat-radio-group>
                     </mat-form-field>
-                    <mat-error *ngIf="!formGroup.controls['notification'].valid">
+                    <mat-error *ngIf="!formGroup.controls['notification'].valid && registerClicked">
                         <div>{{ getErrorMessage('notification') }}</div>
                     </mat-error>
                 </div>
@@ -249,29 +252,32 @@
                 <!-- Events -->
                 <div class="read-only-field event-field">
                     <div>
-                        <mat-checkbox color="primary"
+                        <mat-checkbox id="idFirstWeekCheck"
+                                      color="primary"
                                       labelPosition="before"
                                       class="field-title"
                                       formControlName="firstWeekCheck"
-                                      (change)="toggleTournamentOptions()">
+                                      (change)="toggleTournamentOptions(true,$event)">
                             1st week
                         </mat-checkbox>
                     </div>
                     <div>
-                        <mat-checkbox color="primary"
+                        <mat-checkbox id="idWeekendCheck"
+                                      color="primary"
                                       labelPosition="before"
                                       class="field-title"
                                       formControlName="weekendCheck"
-                                      (change)="toggleTournamentOptions()">
+                                      (change)="toggleTournamentOptions(true,$event)">
                             Week end
                         </mat-checkbox>
                     </div>
                     <div>
-                        <mat-checkbox color="primary"
+                        <mat-checkbox id="idSecondWeekCheck"
+                                      color="primary"
                                       labelPosition="before"
                                       class="field-title"
                                       formControlName="secondWeekCheck"
-                                      (change)="toggleTournamentOptions()">
+                                      (change)="toggleTournamentOptions(true,$event)">
                             2nd week
                         </mat-checkbox>
                     </div>
@@ -390,7 +396,7 @@
                         <li *ngFor="let option of otherEventOptions">
                             <div>
                                 <mat-checkbox [checked]="option.played"
-                                              (change)="option.toggle($event)"
+                                              (change)="toggle($event, option)"
                                               labelPosition="before"
                                               color="primary"
                                               [disabled]="option.disabled">
@@ -411,6 +417,11 @@
     <div class="form-actions">
         <button *ngIf="currentStep == 1"
                 mat-flat-button
+                (click)="resetState()"
+                color="primary">Back
+        </button>
+        <button *ngIf="currentStep == 1"
+                mat-flat-button
                 (click)="findAndNext()"
                 color="primary">Next
         </button>
@@ -422,7 +433,7 @@
         </button>
         <button *ngIf="currentStep == 2"
                 mat-flat-button
-                type="submit"
+                (click)="register()"
                 color="primary">Register
         </button>
     </div>

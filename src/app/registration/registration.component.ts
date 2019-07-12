@@ -1,6 +1,6 @@
-import {Component, HostBinding, OnInit} from '@angular/core';
+import {Component, HostBinding, OnInit, ViewChild} from '@angular/core';
 import {RegistrationService, SubscribersService} from '../shared';
-import {FormBuilder, FormGroup, Validators} from '@angular/forms';
+import {FormBuilder, FormControl, FormGroup, NgForm, Validators} from '@angular/forms';
 import {PlayerEntry} from '../shared/domain/player-entry';
 import {MatCheckboxChange, MatDialog, MatSnackBar} from '@angular/material';
 import {Observable} from 'rxjs';
@@ -21,6 +21,9 @@ export class RegistrationComponent implements OnInit {
     @HostBinding()
     public class: string = componentName;
 
+    @ViewChild('ngForm')
+    public ngForm: NgForm;
+
     public formGroup: FormGroup;
 
     public ageOptions: string[];
@@ -29,11 +32,12 @@ export class RegistrationComponent implements OnInit {
 
     public currentStep: number;
 
-    public players: PlayerEntry[];
-
     public selectedPlayer: PlayerEntry;
 
     public filteredEgdPayer: Observable<EgdPlayerInfo[]>;
+
+    // This is ugly as sin but it's to remove the error message on Notification awhen we enter the first time
+    public registerClicked = false;
 
     public mainFirstWeekOptions: EventOption[] = [
         {
@@ -191,6 +195,8 @@ export class RegistrationComponent implements OnInit {
         },
     ];
 
+    public searchPin: FormControl;
+
     constructor(private subscribersService: SubscribersService,
                 private registerService: RegistrationService,
                 private formBuilder: FormBuilder,
@@ -199,17 +205,28 @@ export class RegistrationComponent implements OnInit {
     }
 
     public ngOnInit(): void {
-        this.subscribersService.getSubscribers()
-            .subscribe((players: PlayerEntry[]) => {
-                this.players = players;
-            });
-
         this.currentStep = 0;
 
         this.ageOptions = ['Adult', 'Teen', 'Child'];
         this.isoCodeOptions = [];
+        this.searchPin = this.formBuilder.control(
+            '',
+            [Validators.required, Validators.pattern(/^\d{1,4}$/)]
+        );
 
-        this.formGroup = this.formBuilder.group({
+        this.formGroup = this.createEmptyForm();
+        this.filteredEgdPayer = this.formGroup.get('lastName').valueChanges
+            .pipe(
+                startWith(''),
+                filter(val => val !== null && val.length > 2),
+                switchMap((value: string) => {
+                    return this.subscribersService.getPlayerFromEgdByLastName(value);
+                })
+            );
+    }
+
+    private createEmptyForm(): FormGroup {
+        return this.formBuilder.group({
             // Screen dependent
             firstWeekCheck: false,
             secondWeekCheck: false,
@@ -232,7 +249,7 @@ export class RegistrationComponent implements OnInit {
                 [Validators.required, Validators.email]
             ],
             notification: [
-                undefined,
+                null,
                 [Validators.required]
             ],
             level: [
@@ -244,10 +261,6 @@ export class RegistrationComponent implements OnInit {
                 [Validators.required]
             ],
             egdPin: [
-                '',
-                [Validators.pattern(/^(\d{1,4}|1\d{7})$/)]
-            ],
-            searchPin: [
                 '',
                 [Validators.pattern(/^(\d{1,4}|1\d{7})$/)]
             ],
@@ -265,15 +278,6 @@ export class RegistrationComponent implements OnInit {
             club: null,
             phone: null
         });
-
-        this.filteredEgdPayer = this.formGroup.get('lastName').valueChanges
-            .pipe(
-                startWith(''),
-                filter(val => val !== null && val.length > 2),
-                switchMap((value: string) => {
-                    return this.subscribersService.getPlayerFromEgdByLastName(value);
-                })
-            );
     }
 
     public selectPlayerFormEgd(egdPlayer: EgdPlayerInfo): void {
@@ -298,75 +302,101 @@ export class RegistrationComponent implements OnInit {
     }
 
     public findAndNext(): void {
-        let foundPlayer: PlayerEntry;
-        const searchPin = this.formGroup.get('searchPin').value;
-        if (searchPin.match(/\d{1,4}/)) {
+        if (this.searchPin.valid) {
+            const searchPin = this.searchPin.value;
             const playerId = Number(searchPin);
-            const result: PlayerEntry[] = this.players.filter(player => {
-                return player.id === playerId;
-            });
-            if (result.length === 1) {
-                foundPlayer = result[0];
-            }
-        } else {
-            const egdPin = Number(searchPin);
-            const result: PlayerEntry[] = this.players.filter(player => {
-                return player.egdpin === egdPin;
-            });
-            if (result.length === 1) {
-                foundPlayer = result[0];
-            }
-        }
-        if (this.formGroup.get('searchPin').valid && foundPlayer) {
-            if (foundPlayer.egdpin && foundPlayer.egdpin !== 0) {
-                this.subscribersService.getPlayerFromEgd(foundPlayer.egdpin)
-                    .subscribe({
-                            next: (value: EgdPlayerInfo) => foundPlayer.egdInfo = value,
-                            complete: () => {
-                                if (typeof foundPlayer.egdInfo !== 'undefined') {
-                                    foundPlayer.club = foundPlayer.egdInfo.club;
-                                    foundPlayer.level = foundPlayer.egdInfo.grade;
+            const waitDialogRef = this.dialog.open(PleaseWaitDialogComponent,
+                {
+                    width: '250px'
+                });
+            this.subscribersService.findSubscriber(playerId)
+                .subscribe({
+                    next: (foundPlayer: PlayerEntry) => {
+                        if (foundPlayer.egdpin && foundPlayer.egdpin !== 0) {
+                            this.subscribersService.getPlayerFromEgd(foundPlayer.egdpin)
+                                .subscribe({
+                                        next: (value: EgdPlayerInfo) => foundPlayer.egdInfo = value,
+                                        complete: () => {
+                                            if (typeof foundPlayer.egdInfo !== 'undefined') {
+                                                foundPlayer.club = foundPlayer.egdInfo.club;
+                                                foundPlayer.level = foundPlayer.egdInfo.grade;
+                                            }
+                                            foundPlayer.toFormGroup(this.formGroup);
+                                        }
+                                    }
+                                );
+                        } else {
+                            this.subscribersService.getPlayerFromEgdByLastNameAndFirstName(
+                                foundPlayer.lastName, foundPlayer.firstName
+                            ).subscribe({
+                                    next:
+                                        (players: EgdPlayerInfo[]) => {
+                                            if (players.length === 1) {
+                                                foundPlayer.egdInfo = players[0];
+                                                foundPlayer.egdpin = players[0].pinPlayer;
+                                                this.formGroup.get('egdPin').setValue(foundPlayer.egdpin);
+                                            }
+                                        },
+                                    complete: () => {
+                                        if (typeof foundPlayer.egdInfo !== 'undefined') {
+                                            foundPlayer.club = foundPlayer.egdInfo.club;
+                                            foundPlayer.level = foundPlayer.egdInfo.grade;
+                                            this.formGroup.get('club').setValue(foundPlayer.club);
+                                            this.formGroup.get('level').setValue(foundPlayer.level);
+                                        }
+                                    }
                                 }
-                                foundPlayer.toFormGroup(this.formGroup);
-                            }
+                            );
                         }
-                    );
-            } else {
-                this.subscribersService.getPlayerFromEgdByLastNameAndFirstName(
-                    foundPlayer.lastName, foundPlayer.firstName
-                ).subscribe({
-                        next:
-                            (players: EgdPlayerInfo[]) => {
-                                if (players.length === 1) {
-                                    foundPlayer.egdInfo = players[0];
-                                    foundPlayer.egdpin = players[0].pinPlayer;
-                                    this.formGroup.get('egdPin').setValue(foundPlayer.egdpin);
-                                }
-                            },
-                        complete: () => {
-                            if (typeof foundPlayer.egdInfo !== 'undefined') {
-                                foundPlayer.club = foundPlayer.egdInfo.club;
-                                foundPlayer.level = foundPlayer.egdInfo.grade;
-                                this.formGroup.get('club').setValue(foundPlayer.club);
-                                this.formGroup.get('level').setValue(foundPlayer.level);
-                            }
+                        foundPlayer.toFormGroup(this.formGroup);
+                        this.toggleTournamentOptions(false);
+                        this.formGroup.markAsPristine();
+                        if (this.formGroup.get('firstWeekCheck').value) {
+                            this.refreshCheckboxes(this.mainFirstWeekOptions, foundPlayer.mainTournament, 0);
+                            this.refreshCheckboxes(this.rapidFirstWeekOptions, foundPlayer.rapidTournament, 0);
                         }
+                        if (this.formGroup.get('secondWeekCheck').value) {
+                            this.refreshCheckboxes(this.mainSecondWeekOptions, foundPlayer.mainTournament, 5);
+                            this.refreshCheckboxes(this.rapidSecondWeekOptions, foundPlayer.rapidTournament, 5);
+                        }
+                        if (this.formGroup.get('weekendCheck').value) {
+                            this.refreshCheckboxes(
+                                this.otherEventOptions
+                                    .filter((eventOption) => eventOption.title === 'Weekend : '),
+                                foundPlayer.weekendTournament,
+                                0);
+                            this.refreshCheckboxes(
+                                this.otherEventOptions
+                                    .filter((eventOption) => eventOption.title !== 'Weekend : '),
+                                foundPlayer.sideEvent,
+                                0);
+                        }
+
+                        this.selectedPlayer = foundPlayer;
+                    },
+                    error: (error1) => {
+                        waitDialogRef.close();
+                        this.searchPin.setErrors({'notfound': true});
+                    },
+                    complete: () => {
+                        waitDialogRef.close();
+                        this.currentStep = 2;
                     }
-                );
-            }
+                });
+        }
+    }
 
-            foundPlayer.toFormGroup(this.formGroup);
-            this.formGroup.markAsPristine();
-            this.toggleTournamentOptions();
-
-            this.selectedPlayer = foundPlayer;
-            this.currentStep = 2;
-        } else {
-            this.formGroup.get('searchPin').setErrors({'notfound': true});
+    private refreshCheckboxes(eventOptions: EventOption[], tournament: string, tournamentIndex: number) {
+        let index = tournamentIndex;
+        if (tournament !== '') {
+            eventOptions.forEach((option: EventOption) => {
+                option.played = tournament.charAt(index++) === '1';
+            });
         }
     }
 
     public register(): void {
+        this.registerClicked = true;
         if (this.formGroup.valid) {
             const waitDialogRef = this.dialog.open(PleaseWaitDialogComponent,
                 {
@@ -418,11 +448,17 @@ export class RegistrationComponent implements OnInit {
         }
     }
 
-    public toggleTournamentOptions(): void {
+    public toggleTournamentOptions(fromScreen: boolean, $event?: MatCheckboxChange): void {
+        if (fromScreen) {
+            this.formGroup.get('paid').setValue(false);
+        }
+        console.log($event);
         const firstWeekCheck = this.formGroup.get('firstWeekCheck').value;
         const secondWeekCheck = this.formGroup.get('secondWeekCheck').value;
         const weekendCheck = this.formGroup.get('weekendCheck').value;
-        if (typeof firstWeekCheck !== 'undefined') {
+        if (typeof firstWeekCheck !== 'undefined' &&
+            $event === undefined ||
+            $event.source.id === 'idFirstWeekCheck') {
             [
                 ...this.mainFirstWeekOptions,
                 ...this.rapidFirstWeekOptions
@@ -437,7 +473,9 @@ export class RegistrationComponent implements OnInit {
                 eventOption.disabled = !firstWeekCheck;
             });
         }
-        if (typeof secondWeekCheck !== 'undefined') {
+        if (typeof secondWeekCheck !== 'undefined' &&
+            $event === undefined ||
+            $event.source.id === 'idSecondWeekCheck') {
             [
                 ...this.mainSecondWeekOptions,
                 ...this.rapidSecondWeekOptions
@@ -453,7 +491,9 @@ export class RegistrationComponent implements OnInit {
                 eventOption.disabled = !secondWeekCheck;
             });
         }
-        if (typeof weekendCheck !== 'undefined') {
+        if (typeof weekendCheck !== 'undefined' &&
+            $event === undefined ||
+            $event.source.id === 'idWeekendCheck') {
             this.otherEventOptions.filter((filterOption) => {
                 return filterOption.title === 'Weekend : ';
             }).forEach((eventOption) => {
@@ -464,21 +504,22 @@ export class RegistrationComponent implements OnInit {
     }
 
     public resetState() {
-        this.formGroup.reset();
-        this.formGroup.markAsPristine();
         this.currentStep = 0;
+        this.registerClicked = false;
         this.snackBar.open('Form reset', 'Ok');
+
+        this.searchPin.reset();
+        this.formGroup.reset();
+        this.ngForm.resetForm();
     }
 
     private transformOptionsToString(eventOptions: EventOption[]): string {
         let result = '';
-        console.log('creating result for', eventOptions);
         eventOptions.forEach((option) => result += option.played ? '1' : '0');
         return result;
     }
 
     public toggle($event: MatCheckboxChange, option: EventOption): void {
-        console.log('>>> changing options', option);
         option.played = $event.checked;
     }
 
@@ -486,9 +527,6 @@ export class RegistrationComponent implements OnInit {
         if (this.formGroup.get(field) !== undefined) {
             if (this.formGroup.get(field).hasError('required')) {
                 return 'This field is required';
-            }
-            if (this.formGroup.get(field).hasError('notfound')) {
-                return 'Player not found';
             }
             if (this.formGroup.get(field).hasError('email')) {
                 return 'Please enter a valid email address';

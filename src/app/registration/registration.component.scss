@@ -88,6 +88,10 @@
   .form-actions {
     display: flex;
     justify-content: flex-end;
+
+    button {
+      margin-right: 15px;
+    }
   }
 
   .form-line {

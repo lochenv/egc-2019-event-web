@@ -43,7 +43,6 @@ export class PlayerEntry {
     @autoserialize
     public validated?: string;
 
-    @autoserialize
     public amount?: number;
 
     @autoserialize
@@ -79,6 +78,7 @@ export class PlayerEntry {
 
     public static OnSerialized(instance: PlayerEntry, json: any): void {
         json.date_creation = instance.dateCreation;
+        json.amount = instance.amount;
         if (instance.dateOfPayment === undefined) {
             instance.dateOfPayment = new Date();
         }
@@ -121,7 +121,7 @@ export class PlayerEntry {
         instance.weekendTournament = json.weekend_tournament;
         instance.sideEvent = json.side_event;
         instance.onSite = json.on_site;
-        if (typeof json.notification !== 'undefined') {
+        if (typeof json.notification !== 'undefined' && json.notification !== null) {
             instance.notification = json.notification === 'yes';
         }
         if (json.egdpin.toString().match(/\d{8}/)) {
@@ -164,6 +164,7 @@ export class PlayerEntry {
         this.egdpin = formGroup.get('egdPin').value;
         this.dateCreation = formGroup.get('registrationDate').value;
         this.paid = formGroup.get('paid').value ? 'yes' : 'no';
+        this.amount = formGroup.get('amount').value;
         this.dateOfPayment = formGroup.get('dateOfPayment').value;
         this.club = formGroup.get('club').value;
         this.phone = formGroup.get('phone').value;
@@ -193,8 +194,6 @@ export class PlayerEntry {
         this.weekendTournament = weekendTournament;
         this.sideEvent = sideEvent;
         this.onSite = 'yes';
-
-        console.log('With form group', this);
     }
 
     public toFormGroup(formGroup: FormGroup): void {
@@ -208,6 +207,7 @@ export class PlayerEntry {
         formGroup.get('egdPin').setValue(this.egdpin);
         formGroup.get('registrationDate').setValue(this.dateCreation);
         formGroup.get('paid').setValue(this.paid === 'yes');
+        formGroup.get('amount').setValue(this.amount);
         formGroup.get('dateOfPayment').setValue(this.dateOfPayment);
         formGroup.get('club').setValue(this.club);
         formGroup.get('phone').setValue(this.phone);

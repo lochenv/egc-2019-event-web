@@ -59,6 +59,9 @@ export class LoginComponent implements OnInit {
                         this.snackBar.open('User ' + userEntry.username + ' successfully logged in', 'Ok');
                         this.router.navigate(['/home']);
                     },
+                    error: (error: any) => {
+                        console.log(error);
+                    },
                     complete: () => pleaseWaitRef.close()
                 });
         } else {
