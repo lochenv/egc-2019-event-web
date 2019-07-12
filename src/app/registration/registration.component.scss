@@ -125,4 +125,17 @@
   }
 }
 
+.paid-field {
+  position: relative;
+  top: -8px;
+  height: 48px;
+  display: flex;
+  align-items: center;
+}
+
+.checkbox-invalid {
+  border: 2px solid $error-color;
+  border-radius: 5px;
+}
+
 

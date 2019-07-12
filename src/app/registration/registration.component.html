@@ -231,8 +231,9 @@
                     </mat-error>
                 </mat-form-field>
 
-                <!-- paid + date -->
-                <div class="read-only-field event-field">
+                <!-- Paid -->
+                <div class="read-only-field event-field paid-field"
+                     [ngClass]="{ 'checkbox-invalid' : !formGroup.controls['paid'].valid && registerClicked } ">
                     <div>
                         <mat-checkbox color="primary"
                                       formControlName="paid"
