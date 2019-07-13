@@ -26,7 +26,14 @@ import {HomeComponent} from './home/home.component';
 import {RouterModule, Routes} from '@angular/router';
 import {RegistrationComponent} from './registration/registration.component';
 import {HTTP_INTERCEPTORS, HttpClientModule} from '@angular/common/http';
-import {AuthenticationInterceptor, ErrorLogoutInterceptor, RegistrationService, SignInService, SubscribersService} from './shared';
+import {
+    AuthenticationInterceptor,
+    ErrorLogoutInterceptor,
+    ExtractionService,
+    RegistrationService,
+    SignInService,
+    SubscribersService
+} from './shared';
 import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {LoginComponent} from './login/login.component';
 import {ExtractListComponent} from './extract-list/extract-list.component';
@@ -125,6 +132,7 @@ const EGC_SNACK_BAR_CONFIG: MatSnackBarConfig = {
         SubscribersService,
         SignInService,
         RegistrationService,
+        ExtractionService,
         {provide: MAT_FORM_FIELD_DEFAULT_OPTIONS, useValue: {appearance: 'outline'}},
         {provide: MAT_SNACK_BAR_DEFAULT_OPTIONS, useValue: EGC_SNACK_BAR_CONFIG},
         {provide: HTTP_INTERCEPTORS, useClass: AuthenticationInterceptor, multi: true},

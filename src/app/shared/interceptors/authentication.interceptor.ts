@@ -12,11 +12,10 @@ export class AuthenticationInterceptor implements HttpInterceptor {
 
     intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
         const currentUser: UserEntity = this.signInService.currentUserValue;
+        console.log('Sendinf request', req);
         if (currentUser && currentUser.token && req.url.indexOf('/EGD/') === -1) {
             req = req.clone({
-                setHeaders: {
-                    Authorization: 'Bearer ' + currentUser.token
-                }
+                setHeaders: this.signInService.retrieveSecurityHeader()
             });
         }
 

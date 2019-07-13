@@ -1,10 +1,10 @@
 import {AfterViewInit, Component, OnInit, QueryList, ViewChildren} from '@angular/core';
-import {SubscribersService} from '../shared/services';
+import {ExtractionService, SubscribersService} from '../shared/services';
 import {PlayerEntry} from '../shared/domain/player-entry';
 import {FileSaverService} from 'ngx-filesaver';
 import {from, of} from 'rxjs';
 import {map, mergeMap, tap} from 'rxjs/operators';
-import {MatCheckboxChange, MatDialog, MatSort, MatTableDataSource} from '@angular/material';
+import {MatCheckboxChange, MatDialog, MatSnackBar, MatSort, MatTableDataSource} from '@angular/material';
 import {SelectionModel} from '@angular/cdk/collections';
 import {ConfirmDownloadDialogComponent} from '../confirm-download-dialog/confirm-download-dialog.component';
 
@@ -26,6 +26,8 @@ export class ExtractListComponent implements OnInit, AfterViewInit {
 
     public showSpinner: boolean;
 
+    private tournamentData = ['Main', 'Weekend', 'Rapid'];
+
     public allColumns: ColumnsState[] = [
         new ColumnsState('firstName', 'First name'),
         new ColumnsState('lastName', 'Last Name'),
@@ -45,7 +47,9 @@ export class ExtractListComponent implements OnInit, AfterViewInit {
 
     constructor(private subscriberService: SubscribersService,
                 private fileSaverService: FileSaverService,
-                public dialog: MatDialog) {
+                private extractionService: ExtractionService,
+                private snackBar: MatSnackBar,
+                private dialog: MatDialog) {
     }
 
     public ngOnInit(): void {
@@ -86,27 +90,69 @@ export class ExtractListComponent implements OnInit, AfterViewInit {
     }
 
     public extractSelection(): void {
-        const dialogRef = this.dialog.open(ConfirmDownloadDialogComponent, {
-            width: '250px',
-            data: ['Main', 'Weekend', 'Rapid', '9x9']
-        });
+        if (typeof this.selection.selected !== 'undefined' && this.selection.selected.length > 0) {
+            const dialogRef = this.dialog.open(ConfirmDownloadDialogComponent, {
+                width: '250px',
+                data: this.tournamentData
+            });
 
-        dialogRef.afterClosed().subscribe({
-            next: (result?: string) => {
-                if (result) {
-                    console.log('>>> Exporting for', result);
-                    this.generateFile(this.selection.selected);
+            dialogRef.afterClosed().subscribe({
+                next: (result?: string) => {
+                    if (result) {
+                        console.log('>>> Exporting for', result);
+                        this.generateFile(this.selection.selected, result);
+                    }
                 }
-            }
-        });
+            });
+        } else {
+            this.snackBar.open('Please select at least one player', 'Ok', {
+                panelClass: 'snack-bar-error'
+            });
+        }
     }
 
-    private generateFile(players: PlayerEntry[]): void {
-        const fileName = 'extract-all.txt';
+    private getPlayingInRounds(player: PlayerEntry, tournamentName: string): string {
+        let result: string;
+        switch (tournamentName) {
+            case 'Main':
+                result = player.mainTournament;
+                break;
+            case 'Weekend':
+                result = player.weekendTournament.repeat(5);
+                break;
+            case 'Rapid' :
+                result = player.rapidTournament;
+                break;
+            default:
+                result = '';
+        }
+        return result;
+    }
+
+    private getExtractionMask(tournamentName: string): string {
+        let result;
+        switch (tournamentName) {
+            case 'Main':
+                result = '1000';
+                break;
+            case 'Rapid' :
+                result = '0100';
+                break;
+            case 'Weekend':
+                result = '0010';
+                break;
+            default:
+                result = '0001';
+        }
+        return '1' + result;
+    }
+
+    private generateFile(players: PlayerEntry[], forTournament: string): void {
+        const fileName = 'extract-macmahon.txt';
         const fileType = this.fileSaverService.genType('txt');
 
         let fullString = '';
-        this.showSpinner = true
+        this.showSpinner = true;
         from(players)
             .pipe(
                 mergeMap((obsPlayer: PlayerEntry) => {
@@ -117,49 +163,52 @@ export class ExtractListComponent implements OnInit, AfterViewInit {
                     return of(obsPlayer);
                 }),
                 map((enrichedPlayer: PlayerEntry) => {
-                    /* surname|firstname|strength|country|club|rating|registration|playinginrounds */
-                    let playerString: string;
+                    const surName = enrichedPlayer.lastName;
+                    const firstName = enrichedPlayer.firstName;
+                    let strength;
+                    let country;
+                    let club;
+                    let rating;
+                    const playingInRound = this.getPlayingInRounds(enrichedPlayer, forTournament);
                     if (enrichedPlayer.egdInfo) {
-                        playerString = enrichedPlayer.egdInfo.lastName + '|' // last name
-                            + enrichedPlayer.egdInfo.firstName + '|' // first name
-                            + enrichedPlayer.egdInfo.grade + '|' // strength
-                            + enrichedPlayer.egdInfo.countryCode + '|' // country
-                            + enrichedPlayer.egdInfo.club + '|' // club
-                            + enrichedPlayer.egdInfo.gor + '|' // rating
-                            + 'F|' // ad final registration
-                            + ''; // playing in round
+                        country = enrichedPlayer.egdInfo.countryCode;
+                        club = enrichedPlayer.egdInfo.club;
+                        rating = enrichedPlayer.egdInfo.gor;
+                        strength = enrichedPlayer.egdInfo.grade;
                     } else {
-                        // Double check to transform country to iso code and club if provided
-                        if (enrichedPlayer.lastName) {
-                            playerString = enrichedPlayer.lastName + '|' // last name
-                                + enrichedPlayer.firstName + '|' // first name
-                                + enrichedPlayer.level + '|' // strength
-                                + '|' // country
-                                + '|' // club
-                                + '|' // rating
-                                + 'F|' // ad final registration
-                                + ''; // playing in round
-                        } else {
-                            playerString = enrichedPlayer.name + '|' // full name
-                                + '|' // first name
-                                + enrichedPlayer.level + '|' // strength
-                                + '|' // country
-                                + '|' // club
-                                + '|' // rating
-                                + 'F|' // ad final registration
-                                + ''; // playing in round
-                        }
+                        country = enrichedPlayer.country;
+                        club = enrichedPlayer.club;
+                        rating = '';
+                        strength = enrichedPlayer.level;
                     }
-                    return playerString;
+                    /* surname|firstname|strength|country|club|rating|registration|playinginrounds */
+                    return surName + '|' + firstName + '|' + strength + '|' +
+                        country + '|' + club + '|' + rating + '|F{' + playingInRound;
                 })
             ).subscribe({
             next: (playerStr: string) => {
                 fullString = fullString.concat(playerStr.concat('\r\n'));
             },
-            complete: () => {
-                const txtBlob = new Blob([new TextEncoder().encode(fullString)], {type: fileType});
-                this.fileSaverService.save(txtBlob, fileName);
+            error: (error: any) => {
+                this.snackBar.open('Unexpected error. Please contact Vincent', 'Ok', {
+                    panelClass: 'snack-bar-error'
+                });
                 this.showSpinner = false;
+            },
+            complete: () => {
+                const extractedMask = this.getExtractionMask(forTournament);
+                this.extractionService.updateExtractedPlayer(players, extractedMask)
+                    .subscribe(
+                        (value: any) => {
+                            if (typeof value.success !== 'undefined' && value.success) {
+                                console.log(value.result);
+                            }
+                            const txtBlob = new Blob([new TextEncoder().encode(fullString)], {type: fileType});
+                            this.fileSaverService.save(txtBlob, fileName);
+                            this.showSpinner = false;
+                            this.selection.clear();
+                        }
+                    );
             }
         });
     }

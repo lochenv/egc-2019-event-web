@@ -74,6 +74,9 @@ export class PlayerEntry {
 
     public sideEvent?: string;
 
+    @autoserialize
+    public extracted?: string;
+
     public egdInfo?: EgdPlayerInfo;
 
     public static OnSerialized(instance: PlayerEntry, json: any): void {

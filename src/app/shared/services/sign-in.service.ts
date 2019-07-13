@@ -1,5 +1,5 @@
 import {Injectable} from '@angular/core';
-import {HttpClient, HttpErrorResponse} from '@angular/common/http';
+import {HttpClient, HttpErrorResponse, HttpHeaders} from '@angular/common/http';
 import {SignInRequest, UserEntity} from '../domain';
 import {map, take} from 'rxjs/operators';
 import {BehaviorSubject, Observable} from 'rxjs';
@@ -24,6 +24,11 @@ export class SignInService {
         console.log('Sign in service', this);
     }
 
+    public retrieveSecurityHeader(): any {
+        return {
+            Authorization: 'Bearer ' + this.currentUserValue.token
+        };
+    }
     public get currentUserValue(): UserEntity {
         return this.currentUserSubject.value;
     }

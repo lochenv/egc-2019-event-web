@@ -1,13 +1,52 @@
-<div class="form">
-    <label for="singleFile">Upload file</label>
-    <input id="singleFile" type="file" [fileUploadInputFor]="fileUploadQueue"/>
-    <br>
+<div class="form upload-width">
+    <h3>
+        Notify round
+    </h3>
+
+    <div class="upload-select">
+        <label for="singleFile">
+            Choose MacMahon file
+        </label>
+        <input id="singleFile"
+               type="file"
+               accept=".xml"
+               [fileUploadInputFor]="fileUploadQueue"/>
+    </div>
 
     <mat-file-upload-queue #fileUploadQueue
                            [fileAlias]="'file'"
-                           [httpUrl]="uploadUrl">
-
+                           [httpUrl]="uploadUrl"
+                           [httpRequestHeaders]="requestHeaders">
         <mat-file-upload [file]="file" [id]="i"
-                         *ngFor="let file of fileUploadQueue.files; let i = index"></mat-file-upload>
+                         *ngFor="let file of fileUploadQueue.files; let i = index"
+                         (onUpload)="uploaded($event)"
+        ></mat-file-upload>
     </mat-file-upload-queue>
+
+    <ng-container *ngIf="uploadReport">
+        <div class="error-detail">
+            <h3>Upload Report</h3>
+
+            <div class="summary">
+                <div>
+                    <span class="label">Succeeded : </span>{{ uploadReport.succeeded.length }}
+                </div>
+                <div>
+                    <span class="label">In Error : </span>{{ uploadReport.inError.length}}
+                </div>
+            </div>
+
+            <table mat-table [dataSource]="uploadReport.inError" class="mat-elevation-z8">
+                <ng-container *ngFor="let col of goPlayerColumns" [matColumnDef]="col.name">
+                    <th mat-header-cell *matHeaderCellDef>
+                        {{col.displayName}}
+                    </th>
+                    <td mat-cell *matCellDef="let element"> {{element[col.name]}}</td>
+                </ng-container>
+
+                <tr mat-header-row *matHeaderRowDef="['lastName', 'firstName', 'email']"></tr>
+                <tr mat-row *matRowDef="let row; columns: ['lastName', 'firstName', 'email'];"></tr>
+            </table>
+        </div>
+    </ng-container>
 </div>
