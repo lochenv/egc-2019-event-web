@@ -88,6 +88,10 @@ export class NotifyRoundComponent implements OnInit {
             }
         }
     }
+
+    public removeOldUpload(): void {
+        this.fileUploadQueue.removeAll();
+    }
 }
 
 class TableColumn {

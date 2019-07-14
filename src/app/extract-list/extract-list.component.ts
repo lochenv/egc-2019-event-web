@@ -6,7 +6,7 @@ import {from, of} from 'rxjs';
 import {map, mergeMap, tap} from 'rxjs/operators';
 import {MatCheckboxChange, MatDialog, MatSnackBar, MatSort, MatTableDataSource} from '@angular/material';
 import {SelectionModel} from '@angular/cdk/collections';
-import {ConfirmDownloadDialogComponent} from '../confirm-download-dialog/confirm-download-dialog.component';
+import {ConfirmDownloadDialogComponent, ExitValue} from '../confirm-download-dialog/confirm-download-dialog.component';
 
 // import TextEncoder from 'utf8-encoding/utf8-encoding';
 // import {TextEncoder} from 'utf8-encoding';
@@ -26,7 +26,7 @@ export class ExtractListComponent implements OnInit, AfterViewInit {
 
     public showSpinner: boolean;
 
-    private tournamentData = ['Main', 'Weekend', 'Rapid'];
+    private tournamentData = ['Main', 'Rapid', 'Weekend', 'Other'];
 
     public allColumns: ColumnsState[] = [
         new ColumnsState('firstName', 'First name'),
@@ -92,15 +92,23 @@ export class ExtractListComponent implements OnInit, AfterViewInit {
     public extractSelection(): void {
         if (typeof this.selection.selected !== 'undefined' && this.selection.selected.length > 0) {
             const dialogRef = this.dialog.open(ConfirmDownloadDialogComponent, {
-                width: '250px',
-                data: this.tournamentData
+                width: '450px',
+                data: {
+                    names: this.tournamentData,
+                    players: this.selection.selected
+                }
             });
 
             dialogRef.afterClosed().subscribe({
-                next: (result?: string) => {
+                next: (result?: ExitValue) => {
                     if (result) {
-                        console.log('>>> Exporting for', result);
-                        this.generateFile(this.selection.selected, result);
+                        const playersToExport: PlayerEntry[] =
+                            this.selection.selected.filter(result.exclusionPredicate.bind(dialogRef));
+                        if (playersToExport.length > 0 ) {
+                            this.generateFile(playersToExport, result.selected);
+                        } else {
+                            this.snackBar.open('After exclusion no more record are available for export', 'Ok');
+                        }
                     }
                 }
             });
@@ -183,7 +191,7 @@ export class ExtractListComponent implements OnInit, AfterViewInit {
                     }
                     /* surname|firstname|strength|country|club|rating|registration|playinginrounds */
                     return surName + '|' + firstName + '|' + strength + '|' +
-                        country + '|' + club + '|' + rating + '|F{' + playingInRound;
+                        country + '|' + club + '|' + rating + '|F|' + playingInRound;
                 })
             ).subscribe({
             next: (playerStr: string) => {
@@ -197,7 +205,7 @@ export class ExtractListComponent implements OnInit, AfterViewInit {
             },
             complete: () => {
                 const extractedMask = this.getExtractionMask(forTournament);
-                this.extractionService.updateExtractedPlayer(players, extractedMask)
+                 this.extractionService.updateExtractedPlayer(players, extractedMask)
                     .subscribe(
                         (value: any) => {
                             if (typeof value.success !== 'undefined' && value.success) {
@@ -285,7 +293,7 @@ export class ExtractListComponent implements OnInit, AfterViewInit {
     }
 
     public getColumnName(col: string): string {
-        return this.allColumns.find(colState => colState.name == col).displayName;
+        return this.allColumns.find(colState => colState.name === col).displayName;
     }
 }
 

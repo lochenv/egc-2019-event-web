@@ -26,7 +26,7 @@ export class SignInService {
 
     public retrieveSecurityHeader(): any {
         return {
-            Authorization: 'Bearer ' + this.currentUserValue.token
+            'X-Authorization': 'Bearer ' + this.currentUserValue.token
         };
     }
     public get currentUserValue(): UserEntity {
