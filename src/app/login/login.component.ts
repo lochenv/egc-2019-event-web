@@ -6,6 +6,7 @@ import * as CryptoJS from 'crypto-js';
 import {MatDialog, MatSnackBar} from '@angular/material';
 import {Router} from '@angular/router';
 import {PleaseWaitDialogComponent} from '../please-wait-dialog/please-wait-dialog.component';
+import {HttpErrorResponse} from '@angular/common/http';
 
 @Component({
     selector: 'app-login',
@@ -59,8 +60,17 @@ export class LoginComponent implements OnInit {
                         this.snackBar.open('User ' + userEntry.username + ' successfully logged in', 'Ok');
                         this.router.navigate(['/home']);
                     },
-                    error: (error: any) => {
-                        console.log(error);
+                    error: (error: HttpErrorResponse) => {
+                        if (typeof error.status !== 'undefined' && error.status === 401) {
+                            this.snackBar.open('Wrong username/password', 'Ok', {
+                                panelClass: 'snack-bar-error'
+                            });
+                        } else {
+                            this.snackBar.open('Unexpected error. Call Vincent', 'Ok', {
+                                panelClass: 'snack-bar-error'
+                            });
+                        }
+                        pleaseWaitRef.close();
                     },
                     complete: () => pleaseWaitRef.close()
                 });

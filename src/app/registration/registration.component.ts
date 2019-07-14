@@ -432,7 +432,7 @@ export class RegistrationComponent implements OnInit {
                     complete: () => {
                         waitDialogRef.close();
                         this.currentStep = 0;
-                        this.formGroup.reset();
+                        this.resetState();
                     }
                 });
         } else {
@@ -452,7 +452,6 @@ export class RegistrationComponent implements OnInit {
         if (fromScreen) {
             this.formGroup.get('paid').setValue(false);
         }
-        console.log($event);
         const firstWeekCheck = this.formGroup.get('firstWeekCheck').value;
         const secondWeekCheck = this.formGroup.get('secondWeekCheck').value;
         const weekendCheck = this.formGroup.get('weekendCheck').value;
@@ -510,6 +509,7 @@ export class RegistrationComponent implements OnInit {
 
         this.searchPin.reset();
         this.formGroup.reset();
+        this.toggleTournamentOptions(false);
         this.ngForm.resetForm();
     }
 
