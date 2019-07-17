@@ -33,6 +33,11 @@ export class AppComponent implements OnInit {
                 icon: 'notifications_active',
                 label: 'Notify round',
                 stateName: 'notify-round'
+            },
+            {
+                icon: 'notifications_active',
+                label: 'Level Comparator',
+                stateName: 'level-comparator'
             }
         ];
 

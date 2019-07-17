@@ -43,6 +43,7 @@ import { PleaseWaitDialogComponent } from './please-wait-dialog/please-wait-dial
 import {AuthGardService} from './shared/services/auth-gard.service';
 import { NotifyRoundComponent } from './notify-round/notify-round.component';
 import {MatFileUploadModule} from 'angular-material-fileupload';
+import { LevelComparatorComponent } from './level-comparator/level-comparator.component';
 
 const appRoutes: Routes = [
     {
@@ -70,6 +71,10 @@ const appRoutes: Routes = [
         canActivate: [AuthGardService]
     },
     {
+        path: 'level-comparator',
+        component: LevelComparatorComponent,
+    },
+    {
         path: '**',
         redirectTo: '/home'
     }
@@ -91,7 +96,8 @@ const EGC_SNACK_BAR_CONFIG: MatSnackBarConfig = {
         ExtractListComponent,
         ConfirmDownloadDialogComponent,
         PleaseWaitDialogComponent,
-        NotifyRoundComponent
+        NotifyRoundComponent,
+        LevelComparatorComponent
     ],
     imports: [
         RouterModule.forRoot(

@@ -1,0 +1,50 @@
+<button mat-flat-button (click)="downloadSql()">Download query</button>
+<table mat-table [dataSource]="filteredPlayers" class="mat-elevation-z8" style="width: 100%;">
+  <ng-container matColumnDef="id">
+    <th mat-header-cell *matHeaderCellDef> Id </th>
+    <td mat-cell *matCellDef="let element"> {{element.id}} </td>
+  </ng-container>
+
+  <!-- Name Column -->
+  <ng-container matColumnDef="lastName">
+    <th mat-header-cell *matHeaderCellDef> Last Name </th>
+    <td mat-cell *matCellDef="let element"> {{element.lastName}} </td>
+  </ng-container>
+
+  <!-- Weight Column -->
+  <ng-container matColumnDef="firstName">
+    <th mat-header-cell *matHeaderCellDef> First Name </th>
+    <td mat-cell *matCellDef="let element"> {{element.firstName}} </td>
+  </ng-container>
+
+  <!-- Symbol Column -->
+  <ng-container matColumnDef="declared">
+    <th mat-header-cell *matHeaderCellDef> Declared </th>
+    <td mat-cell *matCellDef="let element"> {{element.level}} </td>
+  </ng-container>
+
+  <!-- Symbol Column -->
+  <ng-container matColumnDef="egd">
+    <th mat-header-cell *matHeaderCellDef> Egd Rank </th>
+    <td mat-cell *matCellDef="let element"> {{element.egdInfo.grade}} </td>
+  </ng-container>
+
+  <!-- Symbol Column -->
+  <ng-container matColumnDef="egdpin">
+    <th mat-header-cell *matHeaderCellDef> EGD Pin </th>
+    <td mat-cell *matCellDef="let element" [ngClass]="{ 'pin-different' : element.egdInfo.pinPlayer !== element.egdpin }">
+      {{element.egdpin}}
+    </td>
+  </ng-container>
+
+  <!-- Symbol Column -->
+  <ng-container matColumnDef="pinplayer">
+    <th mat-header-cell *matHeaderCellDef > Pin player </th>
+    <td mat-cell *matCellDef="let element" [ngClass]="{ 'pin-different' : element.egdInfo.pinPlayer !== element.egdpin }">
+      {{element.egdInfo.pinPlayer}}
+    </td>
+  </ng-container>
+
+  <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+  <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+</table>
