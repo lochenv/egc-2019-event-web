@@ -26,3 +26,8 @@
   background: $snack-bg-info;
 }
 
+.error-bg .mat-dialog-container{
+  background: $error-color;
+  color: #FFF;
+  font-size: 18px;
+}

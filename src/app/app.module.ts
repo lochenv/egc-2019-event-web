@@ -44,6 +44,7 @@ import {AuthGardService} from './shared/services/auth-gard.service';
 import { NotifyRoundComponent } from './notify-round/notify-round.component';
 import {MatFileUploadModule} from 'angular-material-fileupload';
 import { LevelComparatorComponent } from './level-comparator/level-comparator.component';
+import { ErrorTooManyPlayerComponent } from './error-too-many-player/error-too-many-player.component';
 
 const appRoutes: Routes = [
     {
@@ -97,7 +98,8 @@ const EGC_SNACK_BAR_CONFIG: MatSnackBarConfig = {
         ConfirmDownloadDialogComponent,
         PleaseWaitDialogComponent,
         NotifyRoundComponent,
-        LevelComparatorComponent
+        LevelComparatorComponent,
+        ErrorTooManyPlayerComponent
     ],
     imports: [
         RouterModule.forRoot(
@@ -132,6 +134,7 @@ const EGC_SNACK_BAR_CONFIG: MatSnackBarConfig = {
     ],
     entryComponents: [
         ConfirmDownloadDialogComponent,
+        ErrorTooManyPlayerComponent,
         PleaseWaitDialogComponent
     ],
     providers: [

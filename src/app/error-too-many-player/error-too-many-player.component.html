@@ -1,0 +1,14 @@
+<h1 mat-dialog-title>ERROR</h1>
+<mat-dialog-content>
+  <p>
+    {{ errorValue.message }}
+  </p>
+  <ul>
+    <li *ngIf="errorValue.mainFirstWeek">Main tournament First Week</li>
+    <li *ngIf="errorValue.weekend">Weekend tournament</li>
+    <li *ngIf="errorValue.mainSecondWeek">Main tournament Second Week</li>
+  </ul>
+</mat-dialog-content>
+<mat-dialog-actions>
+  <button mat-flat-button color="accent" [mat-dialog-close]="undefined">Ok</button>
+</mat-dialog-actions>

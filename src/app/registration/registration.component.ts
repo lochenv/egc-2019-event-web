@@ -8,6 +8,9 @@ import {EgdPlayerInfo} from '../shared/domain/egd-player-info.entity';
 import {filter, map, startWith, switchMap} from 'rxjs/operators';
 import {PleaseWaitDialogComponent} from '../please-wait-dialog/please-wait-dialog.component';
 import {HttpErrorResponse} from '@angular/common/http';
+import {main} from '@angular/compiler-cli/src/main';
+import {maxNumberOfPlayer} from '../../environments/environment';
+import {ErrorTooManyPlayerComponent, TooManyPlayerError} from '../error-too-many-player/error-too-many-player.component';
 
 const componentName = 'app-registration';
 
@@ -434,30 +437,59 @@ export class RegistrationComponent implements OnInit {
                 registerObservable = this.subscribersService.getSubscribers()
                     .pipe(
                         switchMap((allRegisteredPlayers: PlayerEntry[]) => {
-                            let numberOfPlayer1stWeek = 0;
-                            let numberOfPlayerWeekend = 0;
-                            let numberOfPlayer2ndWeek = 0;
+                            const mainTournament: number[] = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+                            let weekendTournament = 0;
                             allRegisteredPlayers
-                                .filter((registeredPlayer) => {
-                                    return registeredPlayer.onSite === 'yes';
-                                })
                                 .forEach((onSitePlayer) => {
-                                    if (onSitePlayer.event.match(/.*1stW.*/i)) {
-                                        numberOfPlayer1stWeek++;
+                                    if (typeof onSitePlayer.mainTournament !== 'undefined' &&
+                                        onSitePlayer.mainTournament.match(/[01]{10}/)) {
+                                        Array.from(onSitePlayer.mainTournament).forEach(
+                                            (char, index) => {
+                                                if (char === '1') {
+                                                    mainTournament[index]++;
+                                                }
+                                            }
+                                        );
+                                    } else {
+                                        if (onSitePlayer.event.match(/.*1stW.*/i)) {
+                                            mainTournament[0]++;
+                                            mainTournament[1]++;
+                                            mainTournament[2]++;
+                                            mainTournament[3]++;
+                                            mainTournament[4]++;
+                                        }
+                                        if (onSitePlayer.event.match(/.*2ndW.*/i)) {
+                                            mainTournament[5]++;
+                                            mainTournament[6]++;
+                                            mainTournament[7]++;
+                                            mainTournament[8]++;
+                                            mainTournament[9]++;
+                                        }
                                     }
-                                    if (onSitePlayer.event.match(/.*WE.*/i)) {
-                                        numberOfPlayerWeekend++;
-                                    }
-                                    if (onSitePlayer.event.match(/.*2ndW.*/i)) {
-                                        numberOfPlayer2ndWeek++;
+
+                                    if (onSitePlayer.event.match(/.*WE.*/i) &&
+                                        onSitePlayer.weekendTournament !== '0'
+                                    ) {
+                                        weekendTournament++;
                                     }
                                 });
-                            console.log('Number of players', numberOfPlayer1stWeek, numberOfPlayerWeekend, numberOfPlayer2ndWeek);
-                            return throwError({
-                                message: 'Too many players registered',
-                                tournamentName: 'Main'
-                            });
-                            // return of(player);
+
+                            const tooManyErrorTournament: boolean[] = [false, false, false];
+                            const indexMainTooMany = mainTournament.findIndex(val => val + 1 > maxNumberOfPlayer);
+                            tooManyErrorTournament[0] = player.event.match(/.*1stW.*/) && indexMainTooMany < 5;
+                            tooManyErrorTournament[1] = player.event.match(/.*WE.*/) && weekendTournament > maxNumberOfPlayer;
+                            tooManyErrorTournament[2] = player.event.match(/.*2ndW.*/) && indexMainTooMany >= 5;
+
+                            if (tooManyErrorTournament[0] || tooManyErrorTournament[1] || tooManyErrorTournament[2]) {
+                                return throwError({
+                                    message: 'Too many players registered',
+                                    mainFirstWeek: tooManyErrorTournament[0],
+                                    weekend: tooManyErrorTournament[1],
+                                    mainSecondWeek: tooManyErrorTournament[2]
+                                });
+                            }
+
+                            return of(player);
                         })
                     );
             } else {
@@ -473,9 +505,15 @@ export class RegistrationComponent implements OnInit {
                 },
                 error: (error: any) => { // HttpErrorResponse | TooManyPlayerError
                     if (typeof error.message !== 'undefined' &&
-                        typeof error.tournamentName !== 'undefined') {
+                        typeof error.mainFirstWeek !== 'undefined' &&
+                        typeof error.weekend !== 'undefined' &&
+                        typeof error.mainSecondWeek !== 'undefined') {
                         const tooManyPlayerError = error as TooManyPlayerError;
-                        this.snackBar.open(tooManyPlayerError.message, 'Ok');
+                        this.dialog.open(ErrorTooManyPlayerComponent, {
+                            width: '400px',
+                            data: tooManyPlayerError,
+                            panelClass: 'error-bg'
+                        });
                     } else {
                         const httpErrorReponse = error as HttpErrorResponse;
                         if (httpErrorReponse.status === 412) {
@@ -615,9 +653,4 @@ class EventOption {
     public played: boolean;
     public disabled: boolean;
     public title?: string;
-}
-
-class TooManyPlayerError {
-    public message: string;
-    public tournamentName: string;
 }
