@@ -604,6 +604,8 @@ export class RegistrationComponent implements OnInit {
     public resetState(withMessage?: boolean) {
         this.currentStep = 0;
         this.registerClicked = false;
+        console.log('>>>> Reseting selected Player');
+        this.selectedPlayer = undefined;
         if (typeof withMessage === 'undefined' || withMessage === true) {
             this.snackBar.open('Form reset', 'Ok');
         }
