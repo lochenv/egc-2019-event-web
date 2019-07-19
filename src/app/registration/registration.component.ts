@@ -200,8 +200,11 @@ export class RegistrationComponent implements OnInit {
 
     // Players registered
     public registeredPlayers: PlayerEntry[];
+    public filteredRegisteredPlayers: Observable<PlayerEntry[]>;
 
     public searchPin: FormControl;
+
+    public searchLastName: FormControl;
 
     constructor(private subscribersService: SubscribersService,
                 private registerService: RegistrationService,
@@ -220,6 +223,10 @@ export class RegistrationComponent implements OnInit {
             [Validators.required, Validators.pattern(/^\d{1,4}$/)]
         );
 
+        this.searchLastName = this.formBuilder.control(
+          '',
+        );
+
         this.formGroup = this.createEmptyForm();
         this.filteredEgdPayer = this.formGroup.get('lastName').valueChanges
             .pipe(
@@ -229,7 +236,14 @@ export class RegistrationComponent implements OnInit {
                     return this.subscribersService.getPlayerFromEgdByLastName(value);
                 })
             );
-
+        this.filteredRegisteredPlayers = this.searchLastName.valueChanges
+          .pipe(
+            startWith(''),
+            map((value: string) => {
+              return this.registeredPlayers
+                .filter(regPlayer => regPlayer.lastName.toUpperCase().startsWith(value.toUpperCase()))
+            })
+          );
         this.refreshPlayer();
     }
 
@@ -237,6 +251,7 @@ export class RegistrationComponent implements OnInit {
         this.subscribersService.getSubscribers()
             .subscribe((players: PlayerEntry[]) => {
                 this.registeredPlayers = players;
+                // this.filteredRegisteredPlayers = of(this.registeredPlayers);
             });
     }
 
@@ -295,6 +310,10 @@ export class RegistrationComponent implements OnInit {
         });
     }
 
+    public selectPlayerByName(selectionPlayer: PlayerEntry): void {
+      this.searchPin.setValue(selectionPlayer.id);
+    }
+
     public selectPlayerFormEgd(egdPlayer: EgdPlayerInfo): void {
         if (egdPlayer !== undefined) {
             Object.keys(this.formGroup.controls)
@@ -317,7 +336,7 @@ export class RegistrationComponent implements OnInit {
     }
 
     public findAndNext(): void {
-        if (this.searchPin.valid) {
+       if (this.searchPin.valid) {
             const searchPin = this.searchPin.value;
             const playerId = Number(searchPin);
             const waitDialogRef = this.dialog.open(PleaseWaitDialogComponent,
@@ -610,9 +629,11 @@ export class RegistrationComponent implements OnInit {
         }
 
         this.searchPin.reset();
+        this.searchLastName.reset();
         this.formGroup.reset();
         this.toggleTournamentOptions(false);
         this.ngForm.resetForm();
+        this.refreshPlayer();
     }
 
     private transformOptionsToString(eventOptions: EventOption[]): string {

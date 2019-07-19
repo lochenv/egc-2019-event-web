@@ -3,440 +3,459 @@
       [formGroup]="formGroup"
       #ngForm="ngForm"
       novalidate>
-    <h3>Registration form</h3>
+  <h3>Registration form</h3>
 
-    <!-- First ask if new or existing -->
-    <div *ngIf="currentStep === 0" class="first-step">
-        <button (click)="createNewPlayer()" mat-flat-button color="primary">New</button>
-        <button (click)="currentStep = 1" mat-flat-button color="primary">Pre-registered</button>
-    </div>
+  <!-- First ask if new or existing -->
+  <div *ngIf="currentStep === 0" class="first-step">
+    <button (click)="createNewPlayer()" mat-flat-button color="primary">New</button>
+    <button (click)="currentStep = 1" mat-flat-button color="primary">Pre-registered</button>
+  </div>
 
-    <div *ngIf="currentStep === 1">
+  <div *ngIf="currentStep === 1">
 
-        <mat-form-field class="search-player">
-            <mat-label>Enter EGCBel</mat-label>
-            <input matInput
-                   [formControl]="searchPin"
-                   type="text"
-                   placeholder="Example: 315">
-            <mat-error *ngIf="!searchPin.valid">
-                <div *ngIf="searchPin.hasError('notfound')"> Player not found </div>
-                <div *ngIf="searchPin.hasError('pattern')"> Player egc is made of 1 to 4 digits </div>
-            </mat-error>
+    <mat-form-field class="search-player">
+      <mat-label>Enter EGCBel</mat-label>
+      <input matInput
+             [formControl]="searchPin"
+             type="text"
+             required
+             placeholder="Example: 315">
+      <mat-error *ngIf="!searchPin.valid">
+        <div *ngIf="searchPin.hasError('required')">This field is required</div>
+        <div *ngIf="searchPin.hasError('notfound')">Player not found</div>
+        <div *ngIf="searchPin.hasError('pattern')">Player egc is made of 1 to 4 digits</div>
+      </mat-error>
+    </mat-form-field>
+
+    <mat-form-field class="search-player">
+      <mat-label>Enter Last Name</mat-label>
+      <input matInput
+             type="text"
+             [formControl]="searchLastName"
+             [matAutocomplete]="egcLastName">
+      <mat-autocomplete autoActiveFirstOption #egcLastName>
+        <mat-option
+          *ngFor="let egcRegisteredPlayer of filteredRegisteredPlayers | async"
+          [value]="egcRegisteredPlayer.name"
+          (onSelectionChange)="selectPlayerByName(egcRegisteredPlayer)">
+          <span> {{ egcRegisteredPlayer.lastName }} {{ egcRegisteredPlayer.firstName }}</span>
+        </mat-option>
+      </mat-autocomplete>
+
+    </mat-form-field>
+
+  </div>
+
+  <div class="form-content" *ngIf="currentStep === 2">
+
+    <div class="register-left-page">
+      <!--
+      First page or left part
+        Name + First 1 champ + Tranche d'age (défault +18)
+        Country (iSOCODE ?) + Level + EGD PIN
+        Email + Receive notification
+        Club + Phone
+      Second page or right (see template)
+        First Week | Week-end | Second Week
+        X (Date)   | X (Date) | X (Date)
+        X (Date)   | X (Date) | X (Date)
+        X (Date)   | X (Date) | X (Date)
+        X (Date)   | X (Date) | X (Date)
+        X (Date)   | X (Date) | X (Date)
+      -->
+      <!-- First Line -->
+      <div class="form-line">
+
+        <!-- Last Name -->
+        <mat-form-field class="full-name">
+          <mat-label>Last Name</mat-label>
+          <input matInput
+                 formControlName="lastName"
+                 type="text"
+                 required
+                 [matAutocomplete]="egd">
+          <mat-autocomplete autoActiveFirstOption #egd>
+            <mat-option
+              *ngFor="let egdPlayer of filteredEgdPayer | async"
+              [value]="egdPlayer.lastName"
+              (onSelectionChange)="selectPlayerFormEgd(egdPlayer)">
+              <span> {{ egdPlayer.lastName }} {{ egdPlayer.firstName }}</span>
+            </mat-option>
+          </mat-autocomplete>
+          <mat-error *ngIf="!formGroup.controls['lastName'].valid">
+            <div>{{ getErrorMessage('lastName') }}</div>
+          </mat-error>
         </mat-form-field>
 
-    </div>
+        <!-- First Name -->
+        <mat-form-field class="full-name">
+          <mat-label>First Name</mat-label>
+          <input matInput
+                 formControlName="firstName"
+                 type="text"
+                 required>
+          <mat-error *ngIf="!formGroup.controls['firstName'].valid">
+            <div>{{ getErrorMessage('firstName') }}</div>
+          </mat-error>
+        </mat-form-field>
 
-    <div class="form-content" *ngIf="currentStep === 2">
-
-        <div class="register-left-page">
-            <!--
-            First page or left part
-              Name + First 1 champ + Tranche d'age (défault +18)
-              Country (iSOCODE ?) + Level + EGD PIN
-              Email + Receive notification
-              Club + Phone
-            Second page or right (see template)
-              First Week | Week-end | Second Week
-              X (Date)   | X (Date) | X (Date)
-              X (Date)   | X (Date) | X (Date)
-              X (Date)   | X (Date) | X (Date)
-              X (Date)   | X (Date) | X (Date)
-              X (Date)   | X (Date) | X (Date)
-            -->
-            <!-- First Line -->
-            <div class="form-line">
-
-                <!-- Last Name -->
-                <mat-form-field class="full-name">
-                    <mat-label>Last Name</mat-label>
-                    <input matInput
-                           formControlName="lastName"
-                           type="text"
-                           required
-                           [matAutocomplete]="egd">
-                    <mat-autocomplete autoActiveFirstOption #egd>
-                        <mat-option
-                                *ngFor="let egdPlayer of filteredEgdPayer | async"
-                                [value]="egdPlayer.lastName"
-                                (onSelectionChange)="selectPlayerFormEgd(egdPlayer)">
-                            <span> {{ egdPlayer.lastName }} {{ egdPlayer.firstName }}</span>
-                        </mat-option>
-                    </mat-autocomplete>
-                    <mat-error *ngIf="!formGroup.controls['lastName'].valid">
-                        <div>{{ getErrorMessage('lastName') }}</div>
-                    </mat-error>
-                </mat-form-field>
-
-                <!-- First Name -->
-                <mat-form-field class="full-name">
-                    <mat-label>First Name</mat-label>
-                    <input matInput
-                           formControlName="firstName"
-                           type="text"
-                           required>
-                    <mat-error *ngIf="!formGroup.controls['firstName'].valid">
-                        <div>{{ getErrorMessage('firstName') }}</div>
-                    </mat-error>
-                </mat-form-field>
-
-                <!-- Egcbel -->
-                <div class="read-only-field">
-                    <ng-container *ngIf="selectedPlayer"><span
-                            class="field-title"> EGCBel </span>{{ selectedPlayer.id }}
-                    </ng-container>
-                </div>
-
-                <!-- Age -->
-                <mat-form-field>
-                    <mat-label>Age</mat-label>
-                    <mat-select formControlName="age"
-                                required>
-                        <mat-option *ngFor="let ageOption of ageOptions" [value]="ageOption">
-                            {{ ageOption }}
-                        </mat-option>
-                    </mat-select>
-                    <mat-error *ngIf="!formGroup.controls['age'].valid">
-                        <div>{{ getErrorMessage('age') }}</div>
-                    </mat-error>
-                </mat-form-field>
-            </div>
-
-            <!-- Second line -->
-            <div class="form-line">
-                <!-- Country -->
-                <mat-form-field class="small-input">
-                    <mat-label>Country</mat-label>
-                    <input matInput
-                           formControlName="country"
-                           type="text"
-                           required>
-                    <mat-error *ngIf="!formGroup.controls['country'].valid">
-                        <div>{{ getErrorMessage('country') }}</div>
-                    </mat-error>
-                </mat-form-field>
-
-                <!-- Level -->
-                <mat-form-field class="small-input">
-                    <mat-label>Level</mat-label>
-                    <input matInput
-                           formControlName="level"
-                           placeholder="25k, 5k or 7d"
-                           type="text"
-                           required>
-                    <mat-error *ngIf="!formGroup.controls['level'].valid">
-                        <div>{{ getErrorMessage('level') }}</div>
-                    </mat-error>
-                </mat-form-field>
-
-                <!-- EGD pin -->
-                <mat-form-field class="full-name">
-                    <mat-label>EGD Pin</mat-label>
-                    <input matInput
-                           placeholder="8 digits"
-                           formControlName="egdPin"
-                           type="text">
-                    <mat-error *ngIf="!formGroup.controls['egdPin'].valid">
-                        <div>{{ getErrorMessage('egdPin') }}</div>
-                    </mat-error>
-                </mat-form-field>
-            </div>
-
-            <!-- Third line -->
-            <div class="form-line">
-
-                <!-- Email -->
-                <mat-form-field class="full-name">
-                    <mat-label>E-mail address</mat-label>
-                    <input matInput
-                           formControlName="email"
-                           type="text"
-                           required>
-                    <mat-error *ngIf="!formGroup.controls['email'].valid">
-                        <div>{{ getErrorMessage('email') }}</div>
-                    </mat-error>
-                </mat-form-field>
-
-                <!-- Notification -->
-                <div class="read-only-field">
-                    <!-- hack suggested: https://github.com/angular/components/issues/7891 -->
-                    <mat-form-field>
-                        <mat-label>Notification ?</mat-label>
-                        <input matInput
-                               formControlName="notification"
-                               type="text"
-                               style="visibility: hidden"/>
-                        <mat-radio-group formControlName="notification">
-                            <mat-radio-button
-                                    [value]="true"
-                                    color="primary"
-                                    labelPosition="before">
-                                Yes
-                            </mat-radio-button>
-                            <mat-radio-button
-                                    [value]="false"
-                                    color="primary"
-                                    labelPosition="before">
-                                No
-                            </mat-radio-button>
-                        </mat-radio-group>
-                    </mat-form-field>
-                    <mat-error *ngIf="!formGroup.controls['notification'].valid && registerClicked">
-                        <div>{{ getErrorMessage('notification') }}</div>
-                    </mat-error>
-                </div>
-            </div>
-
-            <!-- Fourth line -->
-            <div class="form-line">
-
-                <!-- Club -->
-                <mat-form-field>
-                    <mat-label>(Club)</mat-label>
-                    <input matInput
-                           formControlName="club"
-                           type="text">
-                </mat-form-field>
-
-                <!-- Phone -->
-                <mat-form-field>
-                    <mat-label>(Phone)</mat-label>
-                    <input matInput
-                           formControlName="phone"
-                           type="text">
-                </mat-form-field>
-            </div>
-
-            <!-- Fifth line -->
-            <div class="form-line">
-
-                <!-- Registration date -->
-                <mat-form-field>
-                    <mat-label>Registration Date</mat-label>
-                    <input matInput
-                           [readonly]="true"
-                           [value]="formGroup.controls['registrationDate']?.value | date: 'yyyy/MM/dd HH:mm:ss'"
-                           type="text">
-                </mat-form-field>
-
-                <!-- Amount -->
-                <mat-form-field>
-                    <mat-label>Amount</mat-label>
-                    <input matInput
-                           formControlName="amount"
-                           type="text"
-                           required>
-                    <mat-error *ngIf="!formGroup.controls['amount'].valid">
-                        <div>{{ getErrorMessage('amount') }}</div>
-                    </mat-error>
-                </mat-form-field>
-
-                <!-- Paid -->
-                <div class="read-only-field event-field paid-field"
-                     [ngClass]="{ 'checkbox-invalid' : !formGroup.controls['paid'].valid && registerClicked } ">
-                    <div>
-                        <mat-checkbox color="primary"
-                                      formControlName="paid"
-                                      labelPosition="before">Paid ?
-                        </mat-checkbox>
-                    </div>
-                </div>
-
-                <!-- Date of Payment -->
-                <mat-form-field class="full-name">
-                    <mat-label>Date of Payment</mat-label>
-                    <input [readonly]="true"
-                           [value]="formGroup.controls['dateOfPayment']?.value | date: 'yyyy/MM/dd'"
-                           matInput/>
-                </mat-form-field>
-
-                <!-- Events -->
-                <div class="read-only-field event-field">
-                    <div>
-                        <mat-checkbox id="idFirstWeekCheck"
-                                      color="primary"
-                                      labelPosition="before"
-                                      class="field-title"
-                                      formControlName="firstWeekCheck"
-                                      (change)="toggleTournamentOptions(true,$event)">
-                            1st week
-                        </mat-checkbox>
-                    </div>
-                    <div>
-                        <mat-checkbox id="idWeekendCheck"
-                                      color="primary"
-                                      labelPosition="before"
-                                      class="field-title"
-                                      formControlName="weekendCheck"
-                                      (change)="toggleTournamentOptions(true,$event)">
-                            Week end
-                        </mat-checkbox>
-                    </div>
-                    <div>
-                        <mat-checkbox id="idSecondWeekCheck"
-                                      color="primary"
-                                      labelPosition="before"
-                                      class="field-title"
-                                      formControlName="secondWeekCheck"
-                                      (change)="toggleTournamentOptions(true,$event)">
-                            2nd week
-                        </mat-checkbox>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Sixth line -->
-            <div class="form-line">
-                <mat-form-field>
-                    <mat-label>
-                        Remarks
-                    </mat-label>
-                    <input matInput
-                           type="text"
-                           formControlName="remarks"/>
-                </mat-form-field>
-            </div>
+        <!-- Egcbel -->
+        <div class="read-only-field">
+          <ng-container *ngIf="selectedPlayer"><span
+            class="field-title"> EGCBel </span>{{ selectedPlayer.id }}
+          </ng-container>
         </div>
 
-        <div class="register-right-page">
-            <div>
-                <h3>
-                    First Week
-                </h3>
+        <!-- Age -->
+        <mat-form-field>
+          <mat-label>Age</mat-label>
+          <mat-select formControlName="age"
+                      required>
+            <mat-option *ngFor="let ageOption of ageOptions" [value]="ageOption">
+              {{ ageOption }}
+            </mat-option>
+          </mat-select>
+          <mat-error *ngIf="!formGroup.controls['age'].valid">
+            <div>{{ getErrorMessage('age') }}</div>
+          </mat-error>
+        </mat-form-field>
+      </div>
 
-                <div class="tournament-options">
-                    <!-- Main -->
-                    <ul>
-                        <li class="tournament-title">Main</li>
-                        <li *ngFor="let option of mainFirstWeekOptions">
-                            <div>
-                                <mat-checkbox [checked]="option.played"
-                                              (change)="toggle($event, option)"
-                                              labelPosition="before"
-                                              color="primary"
-                                              [disabled]="option.disabled">
-                  <span *ngIf="option.title" class="field-title">
-                    {{ option.title }}
-                  </span>
-                                    {{ option.label }}
-                                </mat-checkbox>
-                            </div>
-                        </li>
-                    </ul>
-                    <!-- Rapid -->
-                    <ul>
-                        <li class="tournament-title">Rapid</li>
-                        <li *ngFor="let option of rapidFirstWeekOptions">
-                            <div>
-                                <mat-checkbox [checked]="option.played"
-                                              (change)="toggle($event, option)"
-                                              labelPosition="before"
-                                              color="primary"
-                                              [disabled]="option.disabled">
-                  <span *ngIf="option.title" class="field-title">
-                    {{ option.title }}
-                  </span>
-                                    {{ option.label }}
-                                </mat-checkbox>
-                            </div>
-                        </li>
-                    </ul>
-                </div>
-            </div>
+      <!-- Second line -->
+      <div class="form-line">
+        <!-- Country -->
+        <mat-form-field class="small-input">
+          <mat-label>Country</mat-label>
+          <input matInput
+                 formControlName="country"
+                 type="text"
+                 required>
+          <mat-error *ngIf="!formGroup.controls['country'].valid">
+            <div>{{ getErrorMessage('country') }}</div>
+          </mat-error>
+        </mat-form-field>
 
-            <div>
-                <h3>
-                    Second Week
-                </h3>
-                <div class="tournament-options">
-                    <!-- Main -->
-                    <ul>
-                        <li class="tournament-title">Main</li>
-                        <li *ngFor="let option of mainSecondWeekOptions">
-                            <div>
-                                <mat-checkbox [checked]="option.played"
-                                              (change)="toggle($event, option)"
-                                              labelPosition="before"
-                                              color="primary"
-                                              [disabled]="option.disabled">
-                  <span *ngIf="option.title" class="field-title">
-                    {{ option.title }}
-                  </span>
-                                    {{ option.label }}
-                                </mat-checkbox>
-                            </div>
-                        </li>
-                    </ul>
-                    <!-- Rapid -->
-                    <ul>
-                        <li class="tournament-title">Rapid</li>
-                        <li *ngFor="let option of rapidSecondWeekOptions">
-                            <div>
-                                <mat-checkbox [checked]="option.played"
-                                              (change)="toggle($event, option)"
-                                              labelPosition="before"
-                                              color="primary"
-                                              [disabled]="option.disabled">
-                  <span *ngIf="option.title" class="field-title">
-                    {{ option.title }}
-                  </span>
-                                    {{ option.label }}
-                                </mat-checkbox>
-                            </div>
-                        </li>
-                    </ul>
-                </div>
-            </div>
-            <div>
-                <h3>
-                    Other events
-                </h3>
-                <div class="tournament-options">
-                    <!-- Main -->
-                    <ul>
-                        <li *ngFor="let option of otherEventOptions">
-                            <div>
-                                <mat-checkbox [checked]="option.played"
-                                              (change)="toggle($event, option)"
-                                              labelPosition="before"
-                                              color="primary"
-                                              [disabled]="option.disabled">
-                  <span *ngIf="option.title" class="field-title">
-                    {{ option.title }}
-                  </span>
-                                    {{ option.label }}
-                                </mat-checkbox>
-                            </div>
-                        </li>
-                    </ul>
-                </div>
-            </div>
+        <!-- Level -->
+        <mat-form-field class="small-input">
+          <mat-label>Level</mat-label>
+          <input matInput
+                 formControlName="level"
+                 placeholder="25k, 5k or 7d"
+                 type="text"
+                 required>
+          <mat-error *ngIf="!formGroup.controls['level'].valid">
+            <div>{{ getErrorMessage('level') }}</div>
+          </mat-error>
+        </mat-form-field>
 
-        </div>
-    </div>
+        <!-- EGD pin -->
+        <mat-form-field class="full-name">
+          <mat-label>EGD Pin</mat-label>
+          <input matInput
+                 placeholder="8 digits"
+                 formControlName="egdPin"
+                 type="text">
+          <mat-error *ngIf="!formGroup.controls['egdPin'].valid">
+            <div>{{ getErrorMessage('egdPin') }}</div>
+          </mat-error>
+        </mat-form-field>
+      </div>
 
-    <div class="form-actions">
-        <button *ngIf="currentStep == 1"
-                mat-flat-button
-                (click)="resetState()"
-                color="primary">Back
-        </button>
-        <button *ngIf="currentStep == 1"
-                mat-flat-button
-                (click)="findAndNext()"
-                color="primary">Next
-        </button>
-        <button *ngIf="currentStep == 2"
-                mat-flat-button
+      <!-- Third line -->
+      <div class="form-line">
+
+        <!-- Email -->
+        <mat-form-field class="full-name">
+          <mat-label>E-mail address</mat-label>
+          <input matInput
+                 formControlName="email"
+                 type="text"
+                 required>
+          <mat-error *ngIf="!formGroup.controls['email'].valid">
+            <div>{{ getErrorMessage('email') }}</div>
+          </mat-error>
+        </mat-form-field>
+
+        <!-- Notification -->
+        <div class="read-only-field">
+          <!-- hack suggested: https://github.com/angular/components/issues/7891 -->
+          <mat-form-field>
+            <mat-label>Notification ?</mat-label>
+            <input matInput
+                   formControlName="notification"
+                   type="text"
+                   style="visibility: hidden"/>
+            <mat-radio-group formControlName="notification">
+              <mat-radio-button
+                [value]="true"
                 color="primary"
-                (click)="resetState()"
-                style="margin-right: 20px;">Reset
-        </button>
-        <button *ngIf="currentStep == 2"
-                mat-flat-button
-                (click)="register()"
-                color="primary">Register
-        </button>
+                labelPosition="before">
+                Yes
+              </mat-radio-button>
+              <mat-radio-button
+                [value]="false"
+                color="primary"
+                labelPosition="before">
+                No
+              </mat-radio-button>
+            </mat-radio-group>
+          </mat-form-field>
+          <mat-error *ngIf="!formGroup.controls['notification'].valid && registerClicked">
+            <div>{{ getErrorMessage('notification') }}</div>
+          </mat-error>
+        </div>
+      </div>
+
+      <!-- Fourth line -->
+      <div class="form-line">
+
+        <!-- Club -->
+        <mat-form-field>
+          <mat-label>(Club)</mat-label>
+          <input matInput
+                 formControlName="club"
+                 type="text">
+        </mat-form-field>
+
+        <!-- Phone -->
+        <mat-form-field>
+          <mat-label>(Phone)</mat-label>
+          <input matInput
+                 formControlName="phone"
+                 type="text">
+        </mat-form-field>
+      </div>
+
+      <!-- Fifth line -->
+      <div class="form-line">
+
+        <!-- Registration date -->
+        <mat-form-field>
+          <mat-label>Registration Date</mat-label>
+          <input matInput
+                 [readonly]="true"
+                 [value]="formGroup.controls['registrationDate']?.value | date: 'yyyy/MM/dd HH:mm:ss'"
+                 type="text">
+        </mat-form-field>
+
+        <!-- Amount -->
+        <mat-form-field>
+          <mat-label>Amount</mat-label>
+          <input matInput
+                 formControlName="amount"
+                 type="text"
+                 required>
+          <mat-error *ngIf="!formGroup.controls['amount'].valid">
+            <div>{{ getErrorMessage('amount') }}</div>
+          </mat-error>
+        </mat-form-field>
+
+        <!-- Paid -->
+        <div class="read-only-field event-field paid-field"
+             [ngClass]="{ 'checkbox-invalid' : !formGroup.controls['paid'].valid && registerClicked } ">
+          <div>
+            <mat-checkbox color="primary"
+                          formControlName="paid"
+                          labelPosition="before">Paid ?
+            </mat-checkbox>
+          </div>
+        </div>
+
+        <!-- Date of Payment -->
+        <mat-form-field class="full-name">
+          <mat-label>Date of Payment</mat-label>
+          <input [readonly]="true"
+                 [value]="formGroup.controls['dateOfPayment']?.value | date: 'yyyy/MM/dd'"
+                 matInput/>
+        </mat-form-field>
+
+        <!-- Events -->
+        <div class="read-only-field event-field">
+          <div>
+            <mat-checkbox id="idFirstWeekCheck"
+                          color="primary"
+                          labelPosition="before"
+                          class="field-title"
+                          formControlName="firstWeekCheck"
+                          (change)="toggleTournamentOptions(true,$event)">
+              1st week
+            </mat-checkbox>
+          </div>
+          <div>
+            <mat-checkbox id="idWeekendCheck"
+                          color="primary"
+                          labelPosition="before"
+                          class="field-title"
+                          formControlName="weekendCheck"
+                          (change)="toggleTournamentOptions(true,$event)">
+              Week end
+            </mat-checkbox>
+          </div>
+          <div>
+            <mat-checkbox id="idSecondWeekCheck"
+                          color="primary"
+                          labelPosition="before"
+                          class="field-title"
+                          formControlName="secondWeekCheck"
+                          (change)="toggleTournamentOptions(true,$event)">
+              2nd week
+            </mat-checkbox>
+          </div>
+        </div>
+      </div>
+
+      <!-- Sixth line -->
+      <div class="form-line">
+        <mat-form-field>
+          <mat-label>
+            Remarks
+          </mat-label>
+          <input matInput
+                 type="text"
+                 formControlName="remarks"/>
+        </mat-form-field>
+      </div>
     </div>
+
+    <div class="register-right-page">
+      <div>
+        <h3>
+          First Week
+        </h3>
+
+        <div class="tournament-options">
+          <!-- Main -->
+          <ul>
+            <li class="tournament-title">Main</li>
+            <li *ngFor="let option of mainFirstWeekOptions">
+              <div>
+                <mat-checkbox [checked]="option.played"
+                              (change)="toggle($event, option)"
+                              labelPosition="before"
+                              color="primary"
+                              [disabled]="option.disabled">
+                  <span *ngIf="option.title" class="field-title">
+                    {{ option.title }}
+                  </span>
+                  {{ option.label }}
+                </mat-checkbox>
+              </div>
+            </li>
+          </ul>
+          <!-- Rapid -->
+          <ul>
+            <li class="tournament-title">Rapid</li>
+            <li *ngFor="let option of rapidFirstWeekOptions">
+              <div>
+                <mat-checkbox [checked]="option.played"
+                              (change)="toggle($event, option)"
+                              labelPosition="before"
+                              color="primary"
+                              [disabled]="option.disabled">
+                  <span *ngIf="option.title" class="field-title">
+                    {{ option.title }}
+                  </span>
+                  {{ option.label }}
+                </mat-checkbox>
+              </div>
+            </li>
+          </ul>
+        </div>
+      </div>
+
+      <div>
+        <h3>
+          Second Week
+        </h3>
+        <div class="tournament-options">
+          <!-- Main -->
+          <ul>
+            <li class="tournament-title">Main</li>
+            <li *ngFor="let option of mainSecondWeekOptions">
+              <div>
+                <mat-checkbox [checked]="option.played"
+                              (change)="toggle($event, option)"
+                              labelPosition="before"
+                              color="primary"
+                              [disabled]="option.disabled">
+                  <span *ngIf="option.title" class="field-title">
+                    {{ option.title }}
+                  </span>
+                  {{ option.label }}
+                </mat-checkbox>
+              </div>
+            </li>
+          </ul>
+          <!-- Rapid -->
+          <ul>
+            <li class="tournament-title">Rapid</li>
+            <li *ngFor="let option of rapidSecondWeekOptions">
+              <div>
+                <mat-checkbox [checked]="option.played"
+                              (change)="toggle($event, option)"
+                              labelPosition="before"
+                              color="primary"
+                              [disabled]="option.disabled">
+                  <span *ngIf="option.title" class="field-title">
+                    {{ option.title }}
+                  </span>
+                  {{ option.label }}
+                </mat-checkbox>
+              </div>
+            </li>
+          </ul>
+        </div>
+      </div>
+      <div>
+        <h3>
+          Other events
+        </h3>
+        <div class="tournament-options">
+          <!-- Main -->
+          <ul>
+            <li *ngFor="let option of otherEventOptions">
+              <div>
+                <mat-checkbox [checked]="option.played"
+                              (change)="toggle($event, option)"
+                              labelPosition="before"
+                              color="primary"
+                              [disabled]="option.disabled">
+                  <span *ngIf="option.title" class="field-title">
+                    {{ option.title }}
+                  </span>
+                  {{ option.label }}
+                </mat-checkbox>
+              </div>
+            </li>
+          </ul>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="form-actions">
+    <button *ngIf="currentStep == 1"
+            mat-flat-button
+            (click)="resetState()"
+            color="primary">Back
+    </button>
+    <button *ngIf="currentStep == 1"
+            mat-flat-button
+            (click)="findAndNext()"
+            color="primary">Next
+    </button>
+    <button *ngIf="currentStep == 2"
+            mat-flat-button
+            color="primary"
+            (click)="resetState()"
+            style="margin-right: 20px;">Reset
+    </button>
+    <button *ngIf="currentStep == 2"
+            mat-flat-button
+            (click)="register()"
+            color="primary">Register
+    </button>
+  </div>
 </form>
 
