@@ -476,7 +476,7 @@ export class RegistrationComponent implements OnInit {
 
                             const tooManyErrorTournament: boolean[] = [false, false, false];
                             const indexMainTooMany = mainTournament.findIndex(val => val + 1 > maxNumberOfPlayer);
-                            tooManyErrorTournament[0] = player.event.match(/.*1stW.*/) && indexMainTooMany < 5;
+                            tooManyErrorTournament[0] = player.event.match(/.*1stW.*/) && indexMainTooMany >= 0 && indexMainTooMany < 5;
                             tooManyErrorTournament[1] = player.event.match(/.*WE.*/) && weekendTournament > maxNumberOfPlayer;
                             tooManyErrorTournament[2] = player.event.match(/.*2ndW.*/) && indexMainTooMany >= 5;
 
@@ -604,7 +604,6 @@ export class RegistrationComponent implements OnInit {
     public resetState(withMessage?: boolean) {
         this.currentStep = 0;
         this.registerClicked = false;
-        console.log('>>>> Reseting selected Player');
         this.selectedPlayer = undefined;
         if (typeof withMessage === 'undefined' || withMessage === true) {
             this.snackBar.open('Form reset', 'Ok');
